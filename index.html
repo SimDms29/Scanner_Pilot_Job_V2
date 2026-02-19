@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AeroWatch — Veille Recrutement PNT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --green: #27e080;
+    --green-dim: rgba(39, 224, 128, 0.12);
+    --green-glow: rgba(39, 224, 128, 0.35);
+    --red: #f0503a;
+    --red-dim: rgba(240, 80, 58, 0.1);
+    --amber: #f5a623;
+    --blue: #4ea8de;
+    --bg:  #07090d;
+    --bg2: #0c1018;
+    --bg3: #111922;
+    --bg4: #172030;
+    --border: rgba(255,255,255,0.07);
+    --border-hi: rgba(255,255,255,0.13);
+    --text: #e2eaf4;
+    --text-mid: #8fa3b8;
+    --text-dim: #4a5f72;
+    --mono: 'Share Tech Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ── */
+  header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    height: 64px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .logo { display: flex; align-items: center; gap: 14px; }
+
+  .logo svg {
+    width: 30px; height: 30px;
+    fill: var(--green);
+    filter: drop-shadow(0 0 8px var(--green-glow));
+  }
+
+  .logo-text h1 {
+    font-size: 18px; font-weight: 800;
+    color: var(--text); letter-spacing: 3px; text-transform: uppercase; line-height: 1;
+  }
+
+  .logo-text h1 em { color: var(--green); font-style: normal; }
+
+  .logo-text small {
+    font-family: var(--mono); font-size: 9px;
+    color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase;
+  }
+
+  .header-right { display: flex; align-items: center; gap: 14px; }
+
+  .stats { display: flex; gap: 8px; }
+
+  .stat {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 14px;
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+  }
+
+  .stat-val { font-size: 22px; font-weight: 800; line-height: 1; }
+  .stat-val.g { color: var(--green); text-shadow: 0 0 14px var(--green-glow); }
+  .stat-val.a { color: var(--amber); }
+  .stat-val.r { color: var(--red); }
+
+  .stat-lbl { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase; }
+
+  .btn-scan {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 18px;
+    background: var(--green-dim); border: 1px solid var(--green); color: var(--green);
+    font-family: var(--mono); font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; border-radius: 6px; transition: all 0.2s;
+  }
+
+  .btn-scan:hover { background: rgba(39,224,128,0.2); box-shadow: 0 0 16px var(--green-glow); }
+  .btn-scan:active { transform: scale(0.97); }
+  .btn-scan.loading { opacity: 0.45; cursor: not-allowed; }
+  .btn-scan .spin { animation: spin 1s linear infinite; display: none; }
+  .btn-scan.loading .spin { display: inline; }
+  .btn-scan.loading .icon { display: none; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── BODY ── */
+  .body {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+  }
+
+  /* Drag handle */
+  .drag-handle {
+    flex-shrink: 0;
+    width: 5px;
+    background: var(--border-hi);
+    cursor: col-resize;
+    position: relative;
+    transition: background 0.15s, box-shadow 0.15s;
+    z-index: 50;
+  }
+
+  .drag-handle:hover, .drag-handle.dragging {
+    background: var(--green);
+    box-shadow: 0 0 10px var(--green-glow);
+  }
+
+  .drag-handle::before {
+    content: '⠇';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  /* ── LEFT ── */
+  .left {
+    display: flex; flex-direction: column; min-height: 0;
+    width: 50%;
+    min-width: 280px;
+  }
+
+  /* Filters */
+  .filters-bar {
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .filter-group { display: flex; align-items: center; gap: 8px; }
+
+  .filter-lbl {
+    font-family: var(--mono); font-size: 9px;
+    color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap;
+  }
+
+  .search-input {
+    width: 210px;
+    background: var(--bg3); border: 1px solid var(--border-hi);
+    color: var(--text); font-family: var(--mono); font-size: 13px;
+    padding: 6px 11px; border-radius: 5px; outline: none; transition: border-color 0.2s;
+  }
+
+  .search-input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(39,224,128,0.08); }
+  .search-input::placeholder { color: var(--text-dim); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .chip {
+    padding: 4px 11px;
+    border: 1px solid var(--border-hi); background: transparent;
+    color: var(--text-mid); font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.5px; border-radius: 4px; cursor: pointer; transition: all 0.15s;
+  }
+
+  .chip:hover, .chip.active { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+  .chip.chip-red:hover, .chip.chip-red.active { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+
+  .sep { width: 1px; height: 22px; background: var(--border-hi); flex-shrink: 0; }
+
+  /* Count */
+  .count-bar {
+    flex-shrink: 0;
+    padding: 7px 20px;
+    font-family: var(--mono); font-size: 10px; color: var(--text-dim);
+    background: var(--bg); border-bottom: 1px solid var(--border);
+  }
+
+  .count-bar strong { color: var(--text-mid); font-weight: 400; }
+
+  /* Jobs list */
+  .jobs-list {
+    flex: 1; overflow-y: auto;
+    scrollbar-width: thin; scrollbar-color: var(--border-hi) transparent;
+  }
+
+  .jobs-list::-webkit-scrollbar { width: 4px; }
+  .jobs-list::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+  /* Group header */
+  .group-header {
+    padding: 9px 20px;
+    font-family: var(--mono); font-size: 9px; color: var(--text-dim);
+    letter-spacing: 3px; text-transform: uppercase;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 10;
+  }
+
+  /* Job card */
+  .job-card {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background 0.12s;
+    border-left: 2px solid transparent;
+  }
+
+  .job-card:hover { background: var(--bg3); }
+
+  .job-card.highlighted {
+    background: var(--bg4);
+    border-left-color: var(--green);
+  }
+
+  .job-card.full-status { opacity: 0.5; }
+  .job-card.full-status.highlighted { border-left-color: var(--red); }
+
+  /* Status dot */
+  .status-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 4px;
+  }
+
+  .status-dot.active {
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green-glow), 0 0 0 3px rgba(39,224,128,0.12);
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  .status-dot.full { background: var(--red); }
+  .status-dot.pcc  { background: var(--blue); box-shadow: 0 0 6px rgba(78,168,222,0.4); }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 8px var(--green-glow), 0 0 0 3px rgba(39,224,128,0.12); }
+    50%       { box-shadow: 0 0 14px var(--green-glow), 0 0 0 5px rgba(39,224,128,0.05); }
+  }
+
+  .card-body { flex: 1; min-width: 0; }
+
+  .card-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 5px; gap: 8px;
+  }
+
+  .card-source {
+    font-family: var(--mono); font-size: 10px;
+    color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase;
+  }
+
+  .card-badge {
+    font-family: var(--mono); font-size: 9px;
+    padding: 2px 8px; border-radius: 3px; letter-spacing: 0.5px; flex-shrink: 0;
+  }
+
+  .card-badge.active { background: var(--green-dim); color: var(--green); border: 1px solid rgba(39,224,128,0.2); }
+  .card-badge.full   { background: var(--red-dim);   color: var(--red);   border: 1px solid rgba(240,80,58,0.2); }
+
+  .card-title {
+    font-size: 14px; font-weight: 700;
+    color: var(--text); line-height: 1.45; margin-bottom: 9px;
+  }
+
+  .job-card.full-status .card-title { color: var(--text-mid); }
+
+  .card-bottom {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+
+  .card-location {
+    display: flex; align-items: center; gap: 5px;
+    font-family: var(--mono); font-size: 11px; color: var(--text-mid);
+  }
+
+  .card-location svg { width: 11px; height: 11px; fill: var(--text-dim); flex-shrink: 0; }
+
+  .card-link {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.5px;
+    color: var(--green); text-decoration: none;
+    padding: 3px 10px; border: 1px solid rgba(39,224,128,0.25);
+    border-radius: 4px; background: var(--green-dim);
+    opacity: 0; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
+  }
+
+  .job-card:hover .card-link { opacity: 1; }
+  .card-link:hover { background: rgba(39,224,128,0.22) !important; }
+
+  .empty-state {
+    padding: 64px 24px; text-align: center;
+    color: var(--text-dim); font-family: var(--mono); font-size: 12px; line-height: 2.4;
+  }
+
+  /* ── RIGHT : MAP ── */
+  .map-panel {
+    position: relative;
+    background: var(--bg);
+    flex: 1;
+    min-width: 280px;
+    /* hauteur explicite nécessaire pour que Leaflet calcule correctement */
+    height: 100%;
+  }
+
+  #map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .scan-info {
+    position: absolute; bottom: 12px; left: 12px; z-index: 500;
+    background: rgba(7,9,13,0.9); border: 1px solid var(--border-hi);
+    padding: 10px 14px; font-family: var(--mono); font-size: 10px;
+    color: var(--text-dim); backdrop-filter: blur(8px);
+    border-radius: 6px; line-height: 1.9;
+    white-space: nowrap;
+  }
+
+  .scan-info span { color: var(--text-mid); }
+
+  .live-dot {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 6px var(--green-glow);
+    animation: blink 2s ease-in-out infinite;
+    margin-right: 5px; vertical-align: middle;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.25; }
+  }
+
+  .map-legend {
+    position: absolute; top: 12px; right: 12px; z-index: 500;
+    background: rgba(7,9,13,0.9); border: 1px solid var(--border-hi);
+    padding: 10px 14px; font-family: var(--mono); font-size: 10px;
+    color: var(--text-dim); backdrop-filter: blur(8px);
+    border-radius: 6px; line-height: 2;
+  }
+
+  .legend-row { display: flex; align-items: center; gap: 8px; }
+
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Leaflet dark */
+  .leaflet-tile-pane { filter: brightness(0.33) saturate(0.2); }
+  .leaflet-control-attribution { display: none; }
+  .leaflet-control-zoom a {
+    background: var(--bg2) !important; color: var(--text-mid) !important;
+    border-color: var(--border-hi) !important; font-family: var(--mono) !important;
+  }
+  .leaflet-control-zoom a:hover { background: var(--bg3) !important; }
+  .leaflet-popup-content-wrapper {
+    background: var(--bg2) !important; border: 1px solid var(--border-hi) !important;
+    border-radius: 6px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.7) !important;
+    color: var(--text) !important;
+  }
+  .leaflet-popup-tip { background: var(--bg2) !important; }
+
+  .popup-source { font-family: var(--mono); font-size: 9px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .popup-title  { font-family: var(--sans); font-weight: 700; font-size: 14px; color: var(--text); margin-bottom: 6px; line-height: 1.4; }
+  .popup-loc    { font-family: var(--mono); font-size: 11px; color: var(--text-mid); margin-bottom: 10px; }
+  .popup-link   {
+    display: inline-block; padding: 5px 12px;
+    border: 1px solid var(--green); color: var(--green);
+    font-family: var(--mono); font-size: 10px; text-decoration: none;
+    border-radius: 4px; background: var(--green-dim); transition: background 0.15s;
+  }
+  .popup-link:hover { background: rgba(39,224,128,0.22); }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+    background: var(--bg2); border: 1px solid var(--border-hi);
+    color: var(--text); font-family: var(--mono); font-size: 12px;
+    padding: 11px 18px; border-radius: 6px;
+    transform: translateY(60px); opacity: 0; transition: all 0.25s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M50 8 L92 62 L74 56 L68 88 L50 76 L32 88 L26 56 L8 62 Z"/>
+    </svg>
+    <div class="logo-text">
+      <h1>Aero<em>Watch</em></h1>
+      <small>Veille recrutement PNT · Europe</small>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-val g" id="stat-active">—</div>
+        <div><span class="stat-lbl">Actives</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-val a" id="stat-total">—</div>
+        <div><span class="stat-lbl">Total</span></div>
+      </div>
+      <div class="stat">
+        <div class="stat-val r" id="stat-full">—</div>
+        <div><span class="stat-lbl">Complètes</span></div>
+      </div>
+    </div>
+    <button class="btn-scan" id="btnScan" onclick="triggerScan()">
+      <span class="icon">⟳</span><span class="spin">◌</span> Scanner
+    </button>
+  </div>
+</header>
+
+<div class="body">
+
+  <!-- LEFT -->
+  <div class="left">
+    <div class="filters-bar">
+      <div class="filter-group">
+        <span class="filter-lbl">Recherche</span>
+        <input class="search-input" type="text" id="searchInput" placeholder="Titre, ville, appareil..." oninput="applyFilters()">
+      </div>
+      <div class="sep"></div>
+      <div class="filter-group">
+        <span class="filter-lbl">Source</span>
+        <div class="chips" id="sourceChips">
+          <div class="chip active" data-source="" onclick="toggleSource(this)">Toutes</div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="filter-group">
+        <span class="filter-lbl">Statut</span>
+        <div class="chips">
+          <div class="chip active" data-status="all"    onclick="setStatus('all',this)">Tous</div>
+          <div class="chip"        data-status="active" onclick="setStatus('active',this)">Actives</div>
+          <div class="chip chip-red" data-status="full" onclick="setStatus('full',this)">Complètes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="count-bar"><strong id="countNum">—</strong> offre(s) affichée(s)</div>
+
+    <div class="jobs-list" id="jobsList">
+      <div class="empty-state">Lancement du premier scan...<br>Patientez quelques instants.</div>
+    </div>
+  </div>
+
+  <!-- DRAG HANDLE -->
+  <div class="drag-handle" id="dragHandle"></div>
+
+  <!-- RIGHT : MAP -->
+  <div class="map-panel" id="mapPanel">
+    <div id="map"></div>
+    <div class="map-legend">
+      <div class="legend-row"><span class="legend-dot" style="background:var(--green);box-shadow:0 0 5px var(--green-glow)"></span>Offre active</div>
+      <div class="legend-row"><span class="legend-dot" style="background:var(--red)"></span>Effectifs complets</div>
+      <div class="legend-row"><span class="legend-dot" style="background:var(--blue)"></span>Agrégateur (PCC)</div>
+    </div>
+    <div class="scan-info">
+      <div><span class="live-dot"></span>En ligne</div>
+      <div>Dernier scan : <span id="lastScan">—</span></div>
+      <div>Prochain scan : <span id="nextScan">—</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let filteredJobs = [];
+let activeSource = '';
+let activeStatus = 'all';
+let map, markersLayer;
+
+// ── MAP ──
+function initMap() {
+  map = L.map('map', { center: [49, 8], zoom: 5 });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+  markersLayer = L.layerGroup().addTo(map);
+}
+
+function makeIcon(color, glow) {
+  const svg = `<svg width="26" height="34" viewBox="0 0 26 34" xmlns="http://www.w3.org/2000/svg">
+    <path d="M13 0C5.8 0 0 5.8 0 13C0 23 13 34 13 34C13 34 26 23 26 13C26 5.8 20.2 0 13 0Z" fill="${color}" opacity="0.93"/>
+    <circle cx="13" cy="13" r="5" fill="rgba(0,0,0,0.4)"/>
+  </svg>`;
+  return L.divIcon({
+    html: `<div style="filter:drop-shadow(0 2px 8px ${glow})">${svg}</div>`,
+    className: '', iconSize: [26, 34], iconAnchor: [13, 34], popupAnchor: [0, -36],
+  });
+}
+
+function updateMarkers(jobs) {
+  markersLayer.clearLayers();
+  const off = {};
+  jobs.forEach((job, i) => {
+    const key = `${parseFloat(job.lat).toFixed(2)}_${parseFloat(job.lon).toFixed(2)}`;
+    const n = off[key] = (off[key] || 0);
+    off[key]++;
+    const lat = parseFloat(job.lat) + n * 0.025;
+    const lon = parseFloat(job.lon) + n * 0.025;
+    let color = '#27e080', glow = 'rgba(39,224,128,0.5)';
+    if (job.status === 'full')     { color = '#f0503a'; glow = 'rgba(240,80,58,0.4)'; }
+    else if (job.source === 'PCC') { color = '#4ea8de'; glow = 'rgba(78,168,222,0.4)'; }
+    const m = L.marker([lat, lon], { icon: makeIcon(color, glow) });
+    m.bindPopup(`
+      <div class="popup-source">${job.source}</div>
+      <div class="popup-title">${job.title}</div>
+      <div class="popup-loc">📍 ${job.location}</div>
+      ${job.status === 'full'
+        ? '<span style="color:#f0503a;font-family:var(--mono);font-size:11px">🔴 Effectifs complets</span>'
+        : `<a class="popup-link" href="${job.link}" target="_blank">Voir l'offre →</a>`}
+    `, { maxWidth: 300 });
+    m.on('click', () => highlightCard(i));
+    markersLayer.addLayer(m);
+  });
+}
+
+// ── DATA ──
+async function fetchJobs() {
+  const q = document.getElementById('searchInput').value;
+  const p = new URLSearchParams();
+  if (activeSource) p.append('source', activeSource);
+  if (activeStatus !== 'all') p.append('status', activeStatus);
+  if (q) p.append('q', q);
+  try {
+    const data = await (await fetch('/api/jobs?' + p)).json();
+    filteredJobs = data.jobs || [];
+    renderJobs();
+    updateMarkers(filteredJobs);
+    updateStats(data);
+    updateTimestamps(data);
+  } catch(e) { console.error(e); }
+}
+
+async function fetchSources() {
+  try {
+    const data = await (await fetch('/api/sources')).json();
+    const wrap = document.getElementById('sourceChips');
+    wrap.innerHTML = '<div class="chip active" data-source="" onclick="toggleSource(this)">Toutes</div>';
+    data.sources.forEach(s => {
+      const c = document.createElement('div');
+      c.className = 'chip'; c.dataset.source = s; c.textContent = s;
+      c.onclick = function() { toggleSource(this); };
+      wrap.appendChild(c);
+    });
+  } catch(e) {}
+}
+
+// ── RENDER ──
+function renderJobs() {
+  const list = document.getElementById('jobsList');
+  document.getElementById('countNum').textContent = filteredJobs.length;
+  if (!filteredJobs.length) {
+    list.innerHTML = '<div class="empty-state">Aucune offre ne correspond<br>à votre recherche.</div>';
+    return;
+  }
+  const groups = {};
+  filteredJobs.forEach((job, i) => { (groups[job.source] = groups[job.source] || []).push({ job, i }); });
+  let html = '';
+  for (const [src, items] of Object.entries(groups)) {
+    html += `<div class="group-header">${src} &nbsp;·&nbsp; ${items.length} offre${items.length > 1 ? 's' : ''}</div>`;
+    items.forEach(({ job, i }) => {
+      const isFull = job.status === 'full';
+      const isPCC  = job.source === 'PCC';
+      const dot    = isFull ? 'full' : isPCC ? 'pcc' : 'active';
+      html += `
+        <div class="job-card ${isFull ? 'full-status' : ''}" id="card-${i}" onclick="panToJob(${i})">
+          <div class="status-dot ${dot}"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="card-source">${src}</span>
+              <span class="card-badge ${isFull ? 'full' : 'active'}">${isFull ? 'Complet' : 'Actif'}</span>
+            </div>
+            <div class="card-title">${job.title}</div>
+            <div class="card-bottom">
+              <span class="card-location">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                ${job.location}
+              </span>
+              ${!isFull ? `<a class="card-link" href="${job.link}" target="_blank" onclick="event.stopPropagation()">Voir l'offre →</a>` : ''}
+            </div>
+          </div>
+        </div>`;
+    });
+  }
+  list.innerHTML = html;
+}
+
+function updateStats(data) {
+  const active = (data.jobs||[]).filter(j=>j.status==='active').length;
+  const full   = (data.jobs||[]).filter(j=>j.status==='full').length;
+  document.getElementById('stat-active').textContent = active;
+  document.getElementById('stat-total').textContent  = data.total || 0;
+  document.getElementById('stat-full').textContent   = full;
+}
+
+function updateTimestamps(data) {
+  const fmt = iso => {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  };
+  document.getElementById('lastScan').textContent = fmt(data.last_scan);
+  document.getElementById('nextScan').textContent = fmt(data.next_scan);
+}
+
+// ── INTERACTIONS ──
+function toggleSource(el) {
+  document.querySelectorAll('#sourceChips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); activeSource = el.dataset.source; fetchJobs();
+}
+
+function setStatus(val, el) {
+  document.querySelectorAll('[data-status]').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); activeStatus = val; fetchJobs();
+}
+
+function applyFilters() { fetchJobs(); }
+
+function panToJob(i) {
+  const job = filteredJobs[i]; if (!job) return;
+  map.flyTo([parseFloat(job.lat), parseFloat(job.lon)], 8, { duration: 0.7 });
+  highlightCard(i);
+}
+
+function highlightCard(i) {
+  document.querySelectorAll('.job-card').forEach(c=>c.classList.remove('highlighted'));
+  const card = document.getElementById(`card-${i}`);
+  if (card) { card.classList.add('highlighted'); card.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+}
+
+// ── SCAN ──
+async function triggerScan() {
+  const btn = document.getElementById('btnScan');
+  btn.classList.add('loading'); showToast('⟳ Scan lancé...');
+  try {
+    const data = await (await fetch('/api/scan',{method:'POST'})).json();
+    if (data.status === 'running') { showToast('⚠ Scan déjà en cours'); btn.classList.remove('loading'); return; }
+    pollForResults();
+  } catch(e) { btn.classList.remove('loading'); showToast('❌ Erreur réseau'); }
+}
+
+function pollForResults() {
+  let n = 0;
+  const iv = setInterval(async () => {
+    n++;
+    try {
+      const data = await (await fetch('/api/status')).json();
+      if (!data.scan_running) {
+        clearInterval(iv);
+        document.getElementById('btnScan').classList.remove('loading');
+        await fetchJobs(); await fetchSources();
+        showToast(`✅ Scan terminé — ${data.total} offres trouvées`);
+      }
+    } catch(e) {}
+    if (n > 120) clearInterval(iv);
+  }, 1000);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+// ── RESIZABLE SPLIT ──
+function initResizable() {
+  const handle = document.getElementById('dragHandle');
+  const left   = document.querySelector('.left');
+  const body   = document.querySelector('.body');
+  let dragging = false;
+  let startX, startW;
+
+  handle.addEventListener('mousedown', e => {
+    dragging = true;
+    startX   = e.clientX;
+    startW   = left.getBoundingClientRect().width;
+    handle.classList.add('dragging');
+    document.body.style.cursor     = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const bodyW = body.getBoundingClientRect().width;
+    const delta = e.clientX - startX;
+    const newW  = Math.min(Math.max(startW + delta, 280), bodyW - 280);
+    left.style.width = newW + 'px';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor     = '';
+    document.body.style.userSelect = '';
+    // Laisser le navigateur finir le layout PUIS invalider Leaflet
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (map) {
+          map.invalidateSize({ animate: false });
+        }
+      });
+    });
+  });
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', async () => {
+  initResizable();
+  // Attendre que le layout soit calculé par le navigateur
+  await new Promise(r => setTimeout(r, 50));
+  initMap();
+  await fetchJobs();
+  await fetchSources();
+  setInterval(async () => {
+    const data = await (await fetch('/api/status')).json();
+    updateTimestamps(data);
+  }, 60000);
+});
+</script>
+</body>
+</html>
