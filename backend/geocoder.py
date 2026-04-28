@@ -1,9 +1,10 @@
+import os
 import sqlite3
 import logging
 
 log = logging.getLogger(__name__)
 
-DB_FILE = "aerowatch.db"
+DB_FILE = os.getenv("DB_FILE", "aerowatch.db")
 FALLBACK = (48.5, 10.0)
 
 KNOWN_COORDS: dict[str, tuple[float, float]] = {

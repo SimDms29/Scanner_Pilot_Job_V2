@@ -1,0 +1,21 @@
+services:
+  aerowatch:
+    build: .
+    expose:
+      - "8000"             # visible uniquement sur le réseau Docker, pas sur le net
+    volumes:
+      - aerowatch-data:/app/data
+    environment:
+      - DB_FILE=/app/data/aerowatch.db
+    env_file:
+      - .env
+    networks:
+      - web
+    restart: unless-stopped
+
+volumes:
+  aerowatch-data:
+
+networks:
+  web:
+    external: true         # réseau partagé avec caddy-cv
