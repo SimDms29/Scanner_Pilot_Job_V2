@@ -96,16 +96,45 @@ KNOWN_COORDS: dict[str, tuple[float, float]] = {
     "copenhague": (55.6761, 12.5683),
     "oslo": (59.9139, 10.7522),
     "stockholm": (59.3293, 18.0686),
+    # Moyen-Orient
+    "dubai": (25.2048, 55.2708),
+    "abu dhabi": (24.4539, 54.3773),
+    "doha": (25.2854, 51.5310),
+    "riyadh": (24.6877, 46.7219),
+    # Asie
+    "kuala lumpur": (3.1390, 101.6869),
+    "singapour": (1.3521, 103.8198),
+    "singapore": (1.3521, 103.8198),
+    "hong kong": (22.3193, 114.1694),
+    "tokyo": (35.6762, 139.6503),
+    "shanghai": (31.2304, 121.4737),
+    # Afrique
+    "johannesburg": (-26.2041, 28.0473),
+    "abuja": (9.0765, 7.3986),
+    "nairobi": (-1.2921, 36.8219),
+    "lagos": (6.5244, 3.3792),
+    # Amériques
+    "new york": (40.7128, -74.0060),
+    "los angeles": (34.0522, -118.2437),
+    "miami": (25.7617, -80.1918),
+    "dallas": (32.7767, -96.7970),
+    "toronto": (43.6532, -79.3832),
+    "sao paulo": (-23.5505, -46.6333),
+    # UK hors Londres
+    "penzance": (50.1186, -5.5370),
+    "edinburgh": (55.9533, -3.1883),
+    "birmingham": (52.4862, -1.8904),
     # Défaut
     "europe": (48.5, 10.0),
     "n/c": (48.5, 10.0),
-    "new york": (40.7128, -74.0060),
 }
 
 try:
+    import ssl, certifi
     from geopy.geocoders import Nominatim
     from geopy.extra.rate_limiter import RateLimiter
-    _geolocator = Nominatim(user_agent="aerowatch/1.0")
+    _ssl_ctx = ssl.create_default_context(cafile=certifi.where())
+    _geolocator = Nominatim(user_agent="aerowatch/1.0", ssl_context=_ssl_ctx)
     _geocode = RateLimiter(_geolocator.geocode, min_delay_seconds=1)
     GEOPY_AVAILABLE = True
 except ImportError:

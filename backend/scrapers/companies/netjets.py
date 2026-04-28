@@ -12,7 +12,7 @@ from geocoder import get_coords
 log = logging.getLogger(__name__)
 
 SEARCH_URL = "https://netjets.jobs.hr.cloud.sap/europe/search/?createNewAlert=false&q=pilot"
-BASE_URL   = "https://careers.netjets.com"
+BASE_URL   = "https://netjets.jobs.hr.cloud.sap"
 HEADERS    = {"User-Agent": "Mozilla/5.0"}
 PILOT_KW   = {"pilot", "captain", "first officer", "second in command", "f/o", "pic", "sic"}
 

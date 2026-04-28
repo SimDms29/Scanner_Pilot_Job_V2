@@ -14,7 +14,8 @@ log = logging.getLogger(__name__)
 URL     = "https://www.chalair.fr/offres-emplois"
 BASE    = "https://www.chalair.fr"
 HEADERS = {"User-Agent": "Mozilla/5.0"}
-PILOT_KW = {"pnt", "pilote", "captain", "candidature spontanée"}
+PILOT_KW    = {"pnt", "pilote", "captain", "commandant"}
+EXCLUDE_KW  = {"candidature spontanée", "candidature-spontanée"}
 
 
 def scan() -> list[JobOffer] | None:
@@ -28,6 +29,8 @@ def scan() -> list[JobOffer] | None:
             text = a.get_text(strip=True)
             href = a["href"].lower()
             if not any(k in text.lower() or k in href for k in PILOT_KW):
+                continue
+            if any(k in text.lower() or k in href for k in EXCLUDE_KW):
                 continue
             link = a["href"] if a["href"].startswith("http") else BASE + a["href"]
             if link in seen or len(text) < 5:

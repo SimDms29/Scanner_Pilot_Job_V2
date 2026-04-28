@@ -17,8 +17,9 @@ _scan_running = False
 _lock = threading.Lock()
 
 BAMBOOHR_COMPANIES = [
-    ("jetfly", "Jetfly",  "Luxembourg"),
-    ("comlux", "Comlux",  "Luxembourg"),
+    ("jetfly",      "Jetfly",       "Luxembourg"),
+    ("comlux",      "Comlux",       "Luxembourg"),
+    ("luxaviation", "Luxaviation",  "Luxembourg"),
 ]
 
 RECRUITEE_COMPANIES = [

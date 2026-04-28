@@ -1,10 +1,13 @@
 import logging
+import os
 import threading
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 
@@ -91,7 +94,14 @@ def get_scanner_status():
     }
 
 
-@app.get("/", response_class=HTMLResponse)
-def index():
-    with open("index.html") as f:
-        return f.read()
+DIST = Path(__file__).parent.parent / "frontend" / "dist"
+
+if DIST.exists():
+    app.mount("/assets", StaticFiles(directory=DIST / "assets"), name="assets")
+
+    @app.get("/", include_in_schema=False)
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def spa(full_path: str = ""):
+        if full_path.startswith("api"):
+            return {"error": "not found"}
+        return FileResponse(DIST / "index.html")
