@@ -1,8 +1,8 @@
-# ✈️ AeroWatch — Veille Recrutement PNT
+# AeroWatch — Veille Recrutement PNT
 
 Dashboard web de veille des offres pilotes en Europe. Scan automatique toutes les 12h + bouton de refresh manuel. Notifications Discord conservées.
 
-## 🚀 Installation
+## Installation
 
 ```bash
 # Cloner / placer les fichiers dans un dossier
@@ -17,7 +17,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
 Le dashboard est ensuite accessible sur : **http://localhost:8000**
 
-## 📁 Structure
+## Structure
 
 ```
 aero-monitor/
@@ -27,13 +27,13 @@ aero-monitor/
 └── jobs_data.json    # Données persistées (créé automatiquement)
 ```
 
-## 🔧 Configuration
+##  Configuration
 
 Dans `main.py`, modifier si besoin :
 - `DISCORD_WEBHOOK_URL` — votre webhook Discord
 - `CHECK_INTERVAL_HOURS` — fréquence des scans auto (défaut : 12h)
 
-## 🌐 API Endpoints
+## API Endpoints
 
 | Endpoint | Description |
 |----------|-------------|
@@ -42,7 +42,7 @@ Dans `main.py`, modifier si besoin :
 | `GET /api/status` | Statut général + stats |
 | `POST /api/scan` | Déclencher un scan manuel |
 
-## 🏢 Sources surveillées
+## Sources surveillées pour le moment (plus à venir)
 
 - Oyonnair
 - Pan Européenne
