@@ -7,6 +7,7 @@ import JobList from './components/JobList'
 import MapPanel from './components/MapPanel'
 
 const DEFAULT_FILTERS = { q: '', source: '', status: 'active' }
+const MOBILE_BP = 768
 
 export default function App() {
   const [jobs, setJobs] = useState([])
@@ -19,7 +20,10 @@ export default function App() {
   const [lastScan, setLastScan] = useState(null)
   const [nextScan, setNextScan] = useState(null)
   const [leftPct, setLeftPct] = useState(35)
+  const [activeTab, setActiveTab] = useState('list')
   const dragging = useRef(false)
+
+  const isMobile = () => window.innerWidth <= MOBILE_BP
 
   const loadJobs = useCallback(async () => {
     const data = await getJobs(filters)
@@ -65,7 +69,12 @@ export default function App() {
     pollScan()
   }, [scanRunning, pollScan])
 
-  // Drag handle
+  const handleSelect = useCallback((idx) => {
+    setSelectedIdx(idx)
+    if (isMobile()) setActiveTab('map')
+  }, [])
+
+  // Drag handle (desktop only)
   useEffect(() => {
     const onMove = (e) => {
       if (!dragging.current) return
@@ -84,29 +93,46 @@ export default function App() {
   return (
     <div className="app">
       <Header stats={stats} scanRunning={scanRunning} onScan={handleScan} />
+
       <div className="body">
-        <div className="left" style={{ width: `${leftPct}%` }}>
+        <div className={`left${activeTab === 'map' ? ' mob-hidden' : ''}`} style={{ width: `${leftPct}%` }}>
           <FilterBar sources={sources} filters={filters} onChange={setFilters} />
           <ScannerStatus sources={scannerSrcs} />
           <div className="count-bar">
             {jobs.length} offre{jobs.length !== 1 ? 's' : ''} affichée{jobs.length !== 1 ? 's' : ''}
           </div>
-          <JobList jobs={jobs} selectedIdx={selectedIdx} onSelect={setSelectedIdx} />
+          <JobList jobs={jobs} selectedIdx={selectedIdx} onSelect={handleSelect} />
         </div>
 
         <div className="drag-handle" onMouseDown={() => { dragging.current = true }} />
 
-        <div className="right">
+        <div className={`right${activeTab === 'list' ? ' mob-hidden' : ''}`}>
           <MapPanel
             jobs={jobs}
             selectedIdx={selectedIdx}
-            onSelect={setSelectedIdx}
+            onSelect={handleSelect}
             lastScan={lastScan}
             nextScan={nextScan}
             leftPct={leftPct}
           />
         </div>
       </div>
+
+      {/* Tab bar — mobile only */}
+      <nav className="tab-bar">
+        <button className={`tab-btn${activeTab === 'list' ? ' active' : ''}`} onClick={() => setActiveTab('list')}>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M3 5h18v2H3V5zm0 6h18v2H3v-2zm0 6h18v2H3v-2z"/>
+          </svg>
+          Offres
+        </button>
+        <button className={`tab-btn${activeTab === 'map' ? ' active' : ''}`} onClick={() => setActiveTab('map')}>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+          Carte
+        </button>
+      </nav>
     </div>
   )
 }
