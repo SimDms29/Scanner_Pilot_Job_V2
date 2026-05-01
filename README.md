@@ -1,53 +1,98 @@
-# AeroWatch — Veille Recrutement PNT
+# AeroWatch
 
-Dashboard web de veille des offres pilotes en Europe. Scan automatique toutes les 12h + bouton de refresh manuel. Notifications Discord conservées.
+Veille automatisée des offres de recrutement PNT en aviation d'affaires européenne. Scan de 15+ compagnies toutes les 12h, détection des nouvelles offres par delta de hash, notifications Discord uniquement sur les vraies nouveautés.
 
-## Installation
+---
+
+## Fonctionnement
+
+- **Agrège** les offres pilotes de 15+ opérateurs européens — APIs BambooHR, Recruitee, SAP SuccessFactors, portails custom et pages WordPress
+- **Détecte les changements** par hachage SHA-256 : seules les nouvelles offres déclenchent une notification Discord, zéro spam
+- **Expire automatiquement** les offres disparues de la source lors du scan suivant
+- **Visualise** tous les postes actifs sur une carte Leaflet interactive avec marqueurs colorés par statut
+- **S'auto-héberge** en un seul conteneur Docker derrière Caddy — aucune base externe, SQLite uniquement
+
+## Stack
+
+| Couche | Technologie |
+|---|---|
+| Backend | Python · FastAPI · APScheduler |
+| Scraping | requests · BeautifulSoup · APIs ATS directes |
+| Stockage | SQLite (offres, géocache, statut sources) |
+| Frontend | React · Vite · react-leaflet |
+| Notifications | Discord Webhook |
+| Déploiement | Docker · Caddy (reverse proxy + SSL auto) |
+
+## Sources surveillées
+
+| Compagnie | Pays | Méthode |
+|---|---|---|
+| Jetfly | LU | BambooHR API |
+| Comlux | LU | BambooHR API |
+| Luxaviation | LU/EU | BambooHR API |
+| DC Aviation | DE | Recruitee API |
+| TAG Aviation | CH | Recruitee API |
+| Amelia | FR | API custom |
+| NetJets Europe | PT | SAP SuccessFactors HTML |
+| La Compagnie | FR | WeRecruit HTML |
+| Chalair | FR | WordPress HTML |
+| Pan Européenne | FR | Sentinel statut |
+| Helvetic Airways | CH | Portail custom HTML |
+| Elit'Avia | EU | WordPress Elementor HTML |
+| Avcon Jet | AT | WordPress HTML |
+| Flying Group | BE | WordPress REST API |
+| Air Alliance | DE | Portail custom HTML |
+| Danish Air Transport | DK | WordPress HTML |
+
+## Interface
+
+**Desktop** — panneau gauche (liste filtrée) + panneau droit (carte), séparateur déplaçable à la souris.
+
+**Mobile** — navigation par onglets entre liste et carte. Un tap sur une offre fait voler la carte vers sa position.
+
+Le panneau scanner affiche un dot de statut en temps réel par source (offres trouvées / vide / erreur).
+
+## Lancer en local
 
 ```bash
-# Cloner / placer les fichiers dans un dossier
-cd aero-monitor
-
-# Installer les dépendances
+# Backend
+cd backend
 pip install -r requirements.txt
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
-# Lancer le serveur
-uvicorn main:app --host 0.0.0.0 --port 8000
+# Frontend (terminal séparé)
+cd frontend
+npm install
+npm run dev
 ```
 
-Le dashboard est ensuite accessible sur : **http://localhost:8000**
+## Déployer (Docker + Caddy)
 
-## Structure
+```bash
+# Build et démarrage
+docker compose up -d --build
 
+# Ajouter au Caddyfile existant
+aerowatch.mondomaine.fr {
+    reverse_proxy aerowatch:8000
+}
 ```
-aero-monitor/
-├── main.py           # Backend FastAPI + scrapers + scheduler
-├── index.html        # Frontend (servi par FastAPI)
-├── requirements.txt
-└── jobs_data.json    # Données persistées (créé automatiquement)
-```
 
-##  Configuration
+Les données sont persistées dans un volume nommé (`aerowatch-data`). 
 
-Dans `main.py`, modifier si besoin :
-- `DISCORD_WEBHOOK_URL` — votre webhook Discord
-- `CHECK_INTERVAL_HOURS` — fréquence des scans auto (défaut : 12h)
+## Configuration
 
-## API Endpoints
+| Variable | Défaut | Description |
+|---|---|---|
+| `DISCORD_WEBHOOK_URL` | — | Webhook Discord pour les alertes nouvelles offres |
+| `DB_FILE` | `aerowatch.db` | Chemin SQLite (Docker : `/app/data/aerowatch.db`) |
+| `CHECK_INTERVAL_HOURS` | `12` | Fréquence des scans automatiques |
+
+## API
 
 | Endpoint | Description |
-|----------|-------------|
-| `GET /api/jobs` | Liste des offres (filtres: `source`, `status`, `q`) |
-| `GET /api/sources` | Liste des sources disponibles |
-| `GET /api/status` | Statut général + stats |
-| `POST /api/scan` | Déclencher un scan manuel |
-
-## Sources surveillées pour le moment (plus à venir)
-
-- Oyonnair
-- Pan Européenne
-- Clair Group (AstonJet/Fly)
-- Chalair
-- Jetfly
-- NetJets Europe
-- Pilot Career Center (PCC)
+|---|---|
+| `GET /api/jobs` | Toutes les offres — filtrables par `source`, `status`, `q` |
+| `GET /api/sources` | Liste des sources connues |
+| `GET /api/status` | Horodatages dernier/prochain scan + statut par source |
+| `POST /api/scanner/run` | Déclencher un scan manuel |

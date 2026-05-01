@@ -48,6 +48,11 @@ backend/
       chalair.py       scan() — WordPress HTML statique
       pan_europeenne.py scan() — sentinel statut (email only, surveille "no employment")
       helvetic.py      scan() — portal custom career.helvetic.com, surveille /flightcrew
+      elitavia.py      scan() — WordPress Elementor elitavia.com/careers/, slug /job-post-*
+      avconjet.py      scan() — WordPress avconjet.at/career/, liens /job/*
+      flyinggroup.py   scan() — WordPress REST API /wp-json/wp/v2/posts?categories=7, Anvers
+      air_alliance.py  scan() — Portail custom career.air-alliance.de/en, vols ambulance DE
+      dat.py           scan() — Pages WordPress dat.dk/en/corporate/careers/, ATR + A320 DK
       # ... nouvelles compagnies ici
 
 frontend/
@@ -115,6 +120,11 @@ Logique dans `scanner.py` :
 | Pan Européenne | sentinel statut | `companies/pan_europeenne.py` | ✅ — retourne `status=full` si "no employment" |
 | TAG Aviation | Recruitee API | `ats/recruitee.py` | ✅ — slug `tagaviation3`, postes globaux (HK, Malaisie…) |
 | Helvetic Airways | Portal custom HTML | `companies/helvetic.py` | ✅ — 0 poste en ce moment, se déclenche dès ouverture |
+| Elit'Avia | WordPress Elementor HTML | `companies/elitavia.py` | ✅ — 4 postes FO/Flight Crew |
+| Avcon Jet | WordPress HTML | `companies/avconjet.py` | ✅ — 2 postes FO/Captain Challenger |
+| Flying Group | WordPress REST API cat.7 | `companies/flyinggroup.py` | ✅ — 0 poste pilote actuellement, scraper actif |
+| Air Alliance | Portail custom DE | `companies/air_alliance.py` | ✅ — 2 postes Ready Entry (PC-12, Learjet 45) |
+| Danish Air Transport | Pages WordPress HTML | `companies/dat.py` | ✅ — 4 postes (ATR/A320 CPs & FOs) |
 | Oyonnair | — | — | ⛔ Email only, faux positifs (catégories permanentes) — supprimé |
 | Twin Jet | — | — | ⛔ Email only (`recrutement.pnt@twinjet.net`) |
 | Air Hamburg | — | — | ⛔ Groupe Vista Global, bloqué Cloudflare |
@@ -192,3 +202,8 @@ Pour identifier l'ATS d'un site : F12 → Réseau → XHR → recharger la page 
 - **NetJets** : lien sur `netjets.jobs.hr.cloud.sap` (SAP), pas sur `careers.netjets.com`
 - **Helvetic** : portal Apache Wicket avec session IDs dans les URLs de page, mais les ancres `#id` des postes sont stables — scrape `/flightcrew` sans session
 - **TAG Aviation** : slug Recruitee = `tagaviation3` (pas `tagaviation`)
+- **Elit'Avia** : WordPress Elementor — les liens "More Details→" ne portent pas le titre, fallback sur slug (préfixe `job-post-` strippé automatiquement)
+- **Avcon Jet** : localisation fixée à Vienna, toutes les offres sont basées à Vienna (LOWW)
+- **Flying Group** : WordPress REST API, catégorie 7 = "Job" — 0 poste pilote actuellement mais structure propre
+- **Air Alliance** : portail custom, localisation extraite du lien Google Maps dans le portlet job — certains postes sans localisation → "Germany"
+- **Danish Air Transport** : pluriels dans les titres ("Captains", "officers") — PILOT_RE utilise `captains?`, `first officers?` pour matcher correctement
