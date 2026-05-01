@@ -22,7 +22,7 @@ function markerIcon(job) {
 }
 
 // Flies to selected job and invalidates map size when panel resizes
-function MapController({ jobs, selectedIdx, leftPct }) {
+function MapController({ jobs, selectedIdx, leftPct, activeTab }) {
   const map = useMap()
 
   // Force resize on mount — Leaflet measures before flex layout is stable
@@ -32,11 +32,19 @@ function MapController({ jobs, selectedIdx, leftPct }) {
     return () => clearTimeout(t)
   }, [map])
 
-  // Resize when drag handle moves
+  // Resize when drag handle moves (desktop)
   useEffect(() => {
     const t = setTimeout(() => map.invalidateSize({ animate: false }), 50)
     return () => clearTimeout(t)
   }, [leftPct, map])
+
+  // Resize when tab switches to map (mobile)
+  useEffect(() => {
+    if (activeTab !== 'map') return
+    map.invalidateSize({ animate: false })
+    const t = setTimeout(() => map.invalidateSize({ animate: false }), 100)
+    return () => clearTimeout(t)
+  }, [activeTab, map])
 
   useEffect(() => {
     if (selectedIdx === null) return
@@ -64,7 +72,7 @@ function offsetJobs(jobs) {
   })
 }
 
-export default function MapPanel({ jobs, selectedIdx, onSelect, lastScan, nextScan, leftPct }) {
+export default function MapPanel({ jobs, selectedIdx, onSelect, lastScan, nextScan, leftPct, activeTab }) {
   const placed = offsetJobs(jobs)
 
   return (
@@ -76,7 +84,7 @@ export default function MapPanel({ jobs, selectedIdx, onSelect, lastScan, nextSc
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" maxZoom={18} />
-        <MapController jobs={jobs} selectedIdx={selectedIdx} leftPct={leftPct} />
+        <MapController jobs={jobs} selectedIdx={selectedIdx} leftPct={leftPct} activeTab={activeTab} />
 
         {placed.map((job, i) => (
           <Marker

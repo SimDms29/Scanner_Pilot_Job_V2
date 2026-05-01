@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from storage import upsert_job, expire_missing_jobs, mark_notified, set_meta, update_source_status
 from notifications import send_new_jobs
 from scrapers.ats import bamboohr, recruitee
-from scrapers.companies import amelia, netjets, la_compagnie, chalair, pan_europeenne
+from scrapers.companies import amelia, netjets, la_compagnie, chalair, pan_europeenne, helvetic
 from models import JobOffer
 
 log = logging.getLogger(__name__)
@@ -23,17 +23,17 @@ BAMBOOHR_COMPANIES = [
 ]
 
 RECRUITEE_COMPANIES = [
-    ("dcaviationgmbh", "DC Aviation", "Stuttgart"),
+    ("dcaviationgmbh", "DC Aviation",  "Stuttgart"),
+    ("tagaviation3",   "TAG Aviation", "Geneva"),
 ]
 
 CUSTOM_SCRAPERS = [
-    ("Amelia",         amelia.scan),
-    ("NetJets Europe", netjets.scan),
-    ("La Compagnie",   la_compagnie.scan),
-    ("Chalair",        chalair.scan),
-    ("Pan Européenne", pan_europeenne.scan),
-    # Oyonnair : page statique sans vraies offres, tout passe par email (ops@oyonnair.com)
-    # À réintégrer si ils ouvrent un vrai portail de recrutement
+    ("Amelia",           amelia.scan),
+    ("NetJets Europe",   netjets.scan),
+    ("La Compagnie",     la_compagnie.scan),
+    ("Chalair",          chalair.scan),
+    ("Pan Européenne",   pan_europeenne.scan),
+    ("Helvetic Airways", helvetic.scan),
 ]
 
 
