@@ -47,6 +47,7 @@ backend/
       la_compagnie.py  scan() — WeRecruit HTML
       chalair.py       scan() — WordPress HTML statique
       pan_europeenne.py scan() — sentinel statut (email only, surveille "no employment")
+      helvetic.py      scan() — portal custom career.helvetic.com, surveille /flightcrew
       # ... nouvelles compagnies ici
 
 frontend/
@@ -112,16 +113,16 @@ Logique dans `scanner.py` :
 | La Compagnie | WeRecruit HTML | `companies/la_compagnie.py` | ✅ |
 | Chalair | WordPress HTML | `companies/chalair.py` | ✅ — filtre "candidature spontanée" actif |
 | Pan Européenne | sentinel statut | `companies/pan_europeenne.py` | ✅ — retourne `status=full` si "no employment" |
+| TAG Aviation | Recruitee API | `ats/recruitee.py` | ✅ — slug `tagaviation3`, postes globaux (HK, Malaisie…) |
+| Helvetic Airways | Portal custom HTML | `companies/helvetic.py` | ✅ — 0 poste en ce moment, se déclenche dès ouverture |
 | Oyonnair | — | — | ⛔ Email only, faux positifs (catégories permanentes) — supprimé |
 | Twin Jet | — | — | ⛔ Email only (`recrutement.pnt@twinjet.net`) |
 | Air Hamburg | — | — | ⛔ Groupe Vista Global, bloqué Cloudflare |
 | Volotea | — | — | ⛔ SmartRecruiters slug invalide, page careers inaccessible |
+| ASL Airlines | CezanneHR | — | ⛔ Pas d'API JSON, HTML sans postes pilote identifiables |
 | VistaJet | iCIMS | — | ⏳ Auth complexe |
 | Jet Aviation | SAP SuccessFactors | — | ⏳ Auth complexe |
 | Platoon Aviation | JS pur | — | ⏳ Playwright requis |
-| TAG Aviation | ATS inconnu | — | ⏳ À identifier |
-| Helvetic Airways | ATS inconnu | — | ⏳ À identifier |
-| ASL Airlines | ATS inconnu | — | ⏳ À identifier |
 
 ---
 
@@ -135,7 +136,13 @@ BAMBOOHR_COMPANIES = [
     ("jetfly",      "Jetfly",      "Luxembourg"),
     ("comlux",      "Comlux",      "Luxembourg"),
     ("luxaviation", "Luxaviation", "Luxembourg"),
-    ("newco",       "NewCo",       "Paris"),   # ← ajouter ici
+    ("newco",       "NewCo",       "Paris"),    # ← ajouter ici
+]
+
+RECRUITEE_COMPANIES = [
+    ("dcaviationgmbh", "DC Aviation",  "Stuttgart"),
+    ("tagaviation3",   "TAG Aviation", "Geneva"),
+    ("newco",          "NewCo",        "Paris"),  # ← ajouter ici
 ]
 ```
 
@@ -183,3 +190,5 @@ Pour identifier l'ATS d'un site : F12 → Réseau → XHR → recharger la page 
 - **Pan Européenne** : sentinel volontaire — "Effectifs complets" en `status=full` est le comportement attendu
 - **Chalair** : scraper actif mais ne retournera des offres que si de vraies positions PNT sont publiées (candidatures spontanées filtrées)
 - **NetJets** : lien sur `netjets.jobs.hr.cloud.sap` (SAP), pas sur `careers.netjets.com`
+- **Helvetic** : portal Apache Wicket avec session IDs dans les URLs de page, mais les ancres `#id` des postes sont stables — scrape `/flightcrew` sans session
+- **TAG Aviation** : slug Recruitee = `tagaviation3` (pas `tagaviation`)
