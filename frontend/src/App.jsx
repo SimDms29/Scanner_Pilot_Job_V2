@@ -114,6 +114,7 @@ export default function App() {
             lastScan={lastScan}
             nextScan={nextScan}
             leftPct={leftPct}
+            activeTab={activeTab}
           />
         </div>
       </div>
