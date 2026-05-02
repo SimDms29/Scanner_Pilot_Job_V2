@@ -1,12 +1,12 @@
 # WingJobs
 
-Veille automatisée des offres de recrutement PNT en aviation d'affaires européenne. Scan de 15+ compagnies toutes les 12h, détection des nouvelles offres par delta de hash, notifications Discord uniquement sur les vraies nouveautés.
+Veille automatisée des offres de recrutement PNT en aviation d'affaires européenne. Scan de 20 compagnies toutes les 12h, détection des nouvelles offres par delta de hash, notifications Discord uniquement sur les vraies nouveautés.
 
 ---
 
 ## Fonctionnement
 
-- **Agrège** les offres pilotes de 15+ opérateurs européens — APIs BambooHR, Recruitee, SAP SuccessFactors, portails custom et pages WordPress
+- **Agrège** les offres pilotes de 20 opérateurs européens — APIs BambooHR, Recruitee, CSOD, iCIMS, SAP SuccessFactors, portails custom et pages WordPress
 - **Détecte les changements** par hachage SHA-256 : seules les nouvelles offres déclenchent une notification Discord, zéro spam
 - **Expire automatiquement** les offres disparues de la source lors du scan suivant
 - **Visualise** tous les postes actifs sur une carte Leaflet interactive avec marqueurs colorés par statut
@@ -43,6 +43,10 @@ Veille automatisée des offres de recrutement PNT en aviation d'affaires europé
 | Flying Group | BE | WordPress REST API |
 | Air Alliance | DE | Portail custom HTML |
 | Danish Air Transport | DK | WordPress HTML |
+| Loganair | UK | Salesforce Recruit HTML |
+| Jet Aviation | EU | SAP SuccessFactors custom |
+| VistaJet | EU | iCIMS HTML |
+| Luxair | LU | Cornerstone OnDemand API |
 
 ## Interface
 
