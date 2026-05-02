@@ -53,6 +53,9 @@ backend/
       flyinggroup.py   scan() — WordPress REST API /wp-json/wp/v2/posts?categories=7, Anvers
       air_alliance.py  scan() — Portail custom career.air-alliance.de/en, vols ambulance DE
       dat.py           scan() — Pages WordPress dat.dk/en/corporate/careers/, ATR + A320 DK
+      loganair.py      scan() — Portail Salesforce Recruit loganair.my.salesforce-sites.com
+      jetaviation.py   scan() — SAP SuccessFactors custom jobs.jetaviation.com/go/Europe/
+      vistajet.py      scan() — iCIMS hub-vistaglobal.icims.com, catégorie Flight Deck (8723)
       # ... nouvelles compagnies ici
 
 frontend/
@@ -125,13 +128,17 @@ Logique dans `scanner.py` :
 | Flying Group | WordPress REST API cat.7 | `companies/flyinggroup.py` | ✅ — 0 poste pilote actuellement, scraper actif |
 | Air Alliance | Portail custom DE | `companies/air_alliance.py` | ✅ — 2 postes Ready Entry (PC-12, Learjet 45) |
 | Danish Air Transport | Pages WordPress HTML | `companies/dat.py` | ✅ — 4 postes (ATR/A320 CPs & FOs) |
+| Loganair | Salesforce Recruit HTML | `companies/loganair.py` | ✅ — 2 postes Direct Entry Captain |
+| Jet Aviation | SAP SuccessFactors custom | `companies/jetaviation.py` | ✅ — 1 poste FO (Köln) |
+| VistaJet | iCIMS (in_iframe=1) | `companies/vistajet.py` | ✅ — 5 postes EU (FO, SO, TRI/TRE) |
+| Luxair | Cornerstone OnDemand (CSOD) API | `companies/luxair.py` | ✅ — 5 postes pilote (FO E1/E2, FO/Cpt B737) — token JWT récupéré dynamiquement |
+| Blue Islands | — | — | ⛔ Domaine DNS mort (compagnie probablement cessée) |
+| Air Corsica | — | — | ⛔ Salesforce Lightning (JS pur, `crtarecr` package) — `aircorsica-rh.my.salesforce-sites.com/Recrutement`, Playwright requis |
 | Oyonnair | — | — | ⛔ Email only, faux positifs (catégories permanentes) — supprimé |
 | Twin Jet | — | — | ⛔ Email only (`recrutement.pnt@twinjet.net`) |
 | Air Hamburg | — | — | ⛔ Groupe Vista Global, bloqué Cloudflare |
 | Volotea | — | — | ⛔ SmartRecruiters slug invalide, page careers inaccessible |
 | ASL Airlines | CezanneHR | — | ⛔ Pas d'API JSON, HTML sans postes pilote identifiables |
-| VistaJet | iCIMS | — | ⏳ Auth complexe |
-| Jet Aviation | SAP SuccessFactors | — | ⏳ Auth complexe |
 | Platoon Aviation | JS pur | — | ⏳ Playwright requis |
 
 ---
