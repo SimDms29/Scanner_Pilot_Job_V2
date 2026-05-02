@@ -1,4 +1,4 @@
-# AeroWatch
+# WingJobs
 
 Veille automatisée des offres de recrutement PNT en aviation d'affaires européenne. Scan de 15+ compagnies toutes les 12h, détection des nouvelles offres par delta de hash, notifications Discord uniquement sur les vraies nouveautés.
 
@@ -73,19 +73,19 @@ npm run dev
 docker compose up -d --build
 
 # Ajouter au Caddyfile existant
-aerowatch.mondomaine.fr {
-    reverse_proxy aerowatch:8000
+jobs.wingfuel.fr {
+    reverse_proxy wingjobs:8000
 }
 ```
 
-Les données sont persistées dans un volume nommé (`aerowatch-data`). 
+Les données sont persistées dans un volume nommé (`wingjobs-data`). 
 
 ## Configuration
 
 | Variable | Défaut | Description |
 |---|---|---|
 | `DISCORD_WEBHOOK_URL` | — | Webhook Discord pour les alertes nouvelles offres |
-| `DB_FILE` | `aerowatch.db` | Chemin SQLite (Docker : `/app/data/aerowatch.db`) |
+| `DB_FILE` | `wingjobs.db` | Chemin SQLite (Docker : `/app/data/wingjobs.db`) |
 | `CHECK_INTERVAL_HOURS` | `12` | Fréquence des scans automatiques |
 
 ## API

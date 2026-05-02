@@ -4,7 +4,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-DB_FILE = os.getenv("DB_FILE", "aerowatch.db")
+DB_FILE = os.getenv("DB_FILE", "wingjobs.db")
 FALLBACK = (48.5, 10.0)
 
 KNOWN_COORDS: dict[str, tuple[float, float]] = {
@@ -135,7 +135,7 @@ try:
     from geopy.geocoders import Nominatim
     from geopy.extra.rate_limiter import RateLimiter
     _ssl_ctx = ssl.create_default_context(cafile=certifi.where())
-    _geolocator = Nominatim(user_agent="aerowatch/1.0", ssl_context=_ssl_ctx)
+    _geolocator = Nominatim(user_agent="wingjobs/1.0", ssl_context=_ssl_ctx)
     _geocode = RateLimiter(_geolocator.geocode, min_delay_seconds=1)
     GEOPY_AVAILABLE = True
 except ImportError:
