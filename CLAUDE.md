@@ -1,4 +1,4 @@
-# AeroWatch — CLAUDE.md
+# WingJobs — CLAUDE.md
 
 Veille automatisée des offres de recrutement PNT (Pilotes) en aviation d'affaires, principalement Europe francophone.
 
@@ -19,7 +19,7 @@ Scanner périodique (toutes les 12h) qui agrège les offres pilote de plusieurs 
 - **Backend** : Python / FastAPI + APScheduler — dossier `backend/`
 - **Frontend** : React + Vite + react-leaflet — dossier `frontend/`
 - **Scraping** : `requests` + `BeautifulSoup` (HTML) ou appels API directe (JSON)
-- **Stockage** : SQLite (`aerowatch.db`) via `sqlite3`
+- **Stockage** : SQLite (`wingjobs.db`) via `sqlite3`
 - **Geocodage** : dict statique (fast path) + Nominatim/geopy (fallback, rate-limité, caché en base)
 - **Notifications** : Discord Webhook — uniquement sur les nouvelles offres
 - **Config** : `.env` pour `DISCORD_WEBHOOK_URL`

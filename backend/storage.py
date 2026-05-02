@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Optional
 from models import JobOffer
 
-DB_FILE = os.getenv("DB_FILE", "aerowatch.db")
+DB_FILE = os.getenv("DB_FILE", "wingjobs.db")
 
 
 def init_db():

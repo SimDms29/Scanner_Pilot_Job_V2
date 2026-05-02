@@ -1,12 +1,12 @@
 services:
-  aerowatch:
+  wingjobs:
     build: .
     expose:
       - "8000"             # visible uniquement sur le réseau Docker, pas sur le net
     volumes:
-      - aerowatch-data:/app/data
+      - wingjobs-data:/app/data
     environment:
-      - DB_FILE=/app/data/aerowatch.db
+      - DB_FILE=/app/data/wingjobs.db
     env_file:
       - .env
     networks:
@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  aerowatch-data:
+  wingjobs-data:
 
 networks:
   web:

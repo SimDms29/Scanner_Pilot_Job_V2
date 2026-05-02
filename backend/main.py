@@ -36,7 +36,7 @@ async def lifespan(app: FastAPI):
     sched.shutdown(wait=False)
 
 
-app = FastAPI(title="AeroWatch", lifespan=lifespan)
+app = FastAPI(title="WingJobs", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

@@ -37,7 +37,7 @@ def send_new_jobs(new_jobs: list[JobOffer]):
         })
 
     payload = {
-        "username": "AeroWatch",
+        "username": "WingJobs",
         "content": (
             f"🆕 **{len(new_jobs)} nouvelle(s) offre(s) PNT détectée(s)** — "
             f"{datetime.now().strftime('%d/%m/%Y %H:%M')}"
