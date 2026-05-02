@@ -6,7 +6,7 @@ export default function Header({ stats, scanRunning, onScan }) {
           <path d="M50 8 L92 62 L74 56 L68 88 L50 76 L32 88 L26 56 L8 62 Z" />
         </svg>
         <div className="logo-text">
-          <h1>Aero<em>Watch</em></h1>
+          <h1>Wing<em>Jobs</em></h1>
           <small>Veille recrutement PNT · Europe</small>
         </div>
       </div>
