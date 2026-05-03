@@ -37,7 +37,9 @@ def scan() -> list[JobOffer] | None:
                 continue
 
             title    = cells[0].get_text(strip=True)
-            location = cells[4].get_text(strip=True) or "United Kingdom"
+            raw_loc  = cells[4].get_text(strip=True)
+            # Strip hangar/building suffixes that confuse the geocoder
+            location = re.sub(r'\s+(hangar|building|unit|gate)\s*\d*$', '', raw_loc, flags=re.I).strip() or "United Kingdom"
             href     = a["href"]
 
             if not title or href in seen:
