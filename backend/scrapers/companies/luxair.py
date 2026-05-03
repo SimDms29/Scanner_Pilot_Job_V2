@@ -21,22 +21,22 @@ PILOT_RE   = re.compile(r'\b(pilots?|captains?|first officers?|second officers?|
 EXCLUDE_RE = re.compile(r'\b(cabin|attendant|steward|technician|mechanic|intern|stage|summer|apprenti)\b', re.I)
 
 
-def _get_token() -> str | None:
-    r = requests.get(CAREER_URL, headers=HEADERS, timeout=15)
-    r.raise_for_status()
-    m = re.search(r'"token":"([^"]+)"', r.text)
-    return m.group(1) if m else None
-
-
 def scan() -> list[JobOffer] | None:
     found: list[JobOffer] = []
     try:
-        token = _get_token()
-        if not token:
+        # Session obligatoire : CSOD valide le token via le cookie BrowserId
+        session = requests.Session()
+        session.headers.update(HEADERS)
+
+        r = session.get(CAREER_URL, timeout=15)
+        r.raise_for_status()
+        m = re.search(r'"token":"([^"]+)"', r.text)
+        if not m:
             log.error("Luxair: impossible d'extraire le token CSOD")
             return None
+        token = m.group(1)
 
-        resp = requests.post(
+        resp = session.post(
             API_URL,
             json={
                 "careerSiteId": 27,
@@ -58,7 +58,6 @@ def scan() -> list[JobOffer] | None:
             headers={
                 "Authorization": f"Bearer {token}",
                 "Content-Type": "application/json",
-                "User-Agent": "Mozilla/5.0",
             },
             timeout=15,
         )
