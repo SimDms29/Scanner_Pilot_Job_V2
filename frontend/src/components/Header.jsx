@@ -1,15 +1,17 @@
-export default function Header({ stats, scanRunning, onScan }) {
+import { Link } from 'react-router-dom'
+
+export default function Header({ stats }) {
   return (
     <header className="header">
-      <div className="logo">
-        <svg className="logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <path d="M50 8 L92 62 L74 56 L68 88 L50 76 L32 88 L26 56 L8 62 Z" />
+      <Link to="/" className="logo" style={{ textDecoration: 'none' }}>
+        <svg className="logo-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
         </svg>
         <div className="logo-text">
           <h1>Wing<em>Jobs</em></h1>
           <small>Veille recrutement PNT · Europe</small>
         </div>
-      </div>
+      </Link>
 
       <div className="header-right">
         <div className="stats">
@@ -26,13 +28,6 @@ export default function Header({ stats, scanRunning, onScan }) {
             <div><span className="stat-lbl">Nouvelles</span></div>
           </div>
         </div>
-
-        <button className="btn-scan" disabled={scanRunning} onClick={onScan}>
-          {scanRunning
-            ? <><span className="spin">◌</span> Scan en cours</>
-            : <>⟳ Scanner</>
-          }
-        </button>
       </div>
     </header>
   )

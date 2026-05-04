@@ -3,10 +3,9 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import { divIcon } from 'leaflet'
 
 function markerIcon(job) {
-  let color = '#27e080', glow = 'rgba(39,224,128,0.5)'
+  let color = '#34d399', glow = 'rgba(52,211,153,0.45)'
   if (job.status === 'full')         { color = '#f0503a'; glow = 'rgba(240,80,58,0.4)' }
-  else if (job.status === 'expired') { color = '#4a5f72'; glow = 'none' }
-  else if (job.source === 'Amelia')  { color = '#a855f7'; glow = 'rgba(168,85,247,0.5)' }
+  else if (job.status === 'expired') { color = '#475569'; glow = 'none' }
 
   const svg = `<svg width="26" height="34" viewBox="0 0 26 34" xmlns="http://www.w3.org/2000/svg">
     <path d="M13 0C5.8 0 0 5.8 0 13C0 23 13 34 13 34C13 34 26 23 26 13C26 5.8 20.2 0 13 0Z" fill="${color}" opacity="0.93"/>
@@ -110,7 +109,6 @@ export default function MapPanel({ jobs, selectedIdx, onSelect, lastScan, nextSc
       <div className="map-overlay top-right">
         <div className="legend-row"><span className="legend-dot" style={{ background: 'var(--green)', boxShadow: '0 0 5px var(--green-glow)' }} />Offre active</div>
         <div className="legend-row"><span className="legend-dot" style={{ background: 'var(--red)' }} />Effectifs complets</div>
-        <div className="legend-row"><span className="legend-dot" style={{ background: 'var(--purple)' }} />Amelia</div>
       </div>
 
       {/* Scan info */}
