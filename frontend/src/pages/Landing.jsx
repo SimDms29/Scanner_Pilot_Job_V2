@@ -1,4 +1,49 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+
+const UPDATES = [
+  {
+    date: 'Mai 2026',
+    items: [
+      'Filtre Captain / F/O ajouté sur la page des offres',
+      'GlobalJet intégré via Playwright (9 postes pilote : G650, Falcon 2000, PC24, A320ACJ…)',
+      'DAS Private Jets ajouté (Phenom 300, Mengen)',
+      'Arcus Air intégré (portail HubSpot)',
+      '26 compagnies scannées au total',
+    ],
+  },
+  {
+    date: 'Avril 2026',
+    items: [
+      'Lancement de WingJobs en accès ouvert',
+      'Première version avec 22 compagnies : VistaJet, Luxair, Loganair, Jet Aviation…',
+      'Carte interactive Europe avec marqueurs par statut',
+    ],
+  },
+]
+
+function ActuModal({ onClose }) {
+  return (
+    <div className="wf-backdrop" onClick={onClose}>
+      <div className="wf-modal actu-modal" onClick={e => e.stopPropagation()}>
+        <button className="wf-close" onClick={onClose} aria-label="Fermer">✕</button>
+        <div className="actu-title">Nouveautés</div>
+        <div className="actu-list">
+          {UPDATES.map(block => (
+            <div key={block.date} className="actu-block">
+              <div className="actu-date">{block.date}</div>
+              <ul className="actu-items">
+                {block.items.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const STATS = [
   { value: '26', label: 'Compagnies scannées' },
@@ -41,20 +86,59 @@ const SOURCES = [
   'Widerøe', 'Spreeflug', 'GlobeAir', 'Arcus Air', 'Air Alliance', '+ 10 autres',
 ]
 
+function WingFuelModal({ onClose }) {
+  return (
+    <div className="wf-backdrop" onClick={onClose}>
+      <div className="wf-modal" onClick={e => e.stopPropagation()}>
+        <button className="wf-close" onClick={onClose} aria-label="Fermer">✕</button>
+        <div className="wf-logo">Wing<em>Fuel</em></div>
+        <p className="wf-desc">
+          Digitalisez votre gestion carburant, suivez votre consommation et optimisez vos coûts en aviation générale.
+        </p>
+        <ul className="wf-features">
+          <li>Suivi de consommation par vol</li>
+          <li>Tarifs carburant en temps réel</li>
+          <li>Rapports et historique exportables</li>
+        </ul>
+        <a
+          href="https://wingfuel.fr"
+          target="_blank"
+          rel="noreferrer"
+          className="wf-cta"
+          onClick={onClose}
+        >
+          Découvrir wingfuel.fr →
+        </a>
+      </div>
+    </div>
+  )
+}
+
 export default function Landing() {
+  const [showWingFuel, setShowWingFuel] = useState(false)
+  const [showActu, setShowActu] = useState(false)
+
   return (
     <div className="landing">
       <nav className="landing-nav">
         <Link to="/" className="logo" style={{ textDecoration: 'none' }}>
-          <svg className="logo-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-          </svg>
           <div className="logo-text">
             <h1>Wing<em>Jobs</em></h1>
           </div>
         </Link>
-        <Link to="/jobs" className="landing-nav-link">Voir les offres →</Link>
+        <div className="landing-nav-right">
+          <button className="landing-nav-actu" onClick={() => setShowActu(true)}>
+            Actu
+          </button>
+          <button className="landing-nav-wf" onClick={() => setShowWingFuel(true)}>
+            Wing<em>Fuel</em>
+          </button>
+          <Link to="/jobs" className="landing-nav-link">Voir les offres →</Link>
+        </div>
       </nav>
+
+      {showWingFuel && <WingFuelModal onClose={() => setShowWingFuel(false)} />}
+      {showActu && <ActuModal onClose={() => setShowActu(false)} />}
 
       {/* Hero */}
       <main className="landing-main">

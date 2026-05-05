@@ -24,13 +24,13 @@ async def lifespan(app: FastAPI):
     storage.init_db()
     sched = BackgroundScheduler()
     sched.add_job(
-        lambda: scanner.run_scan(notify_discord=True),
+        scanner.run_scan,
         "interval",
         hours=scanner.CHECK_INTERVAL_HOURS,
         id="auto_scan",
     )
     sched.start()
-    t = threading.Thread(target=scanner.run_scan, kwargs={"notify_discord": False}, daemon=True)
+    t = threading.Thread(target=scanner.run_scan, daemon=True)
     t.start()
     yield
     sched.shutdown(wait=False)
