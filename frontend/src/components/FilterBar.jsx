@@ -36,6 +36,21 @@ export default function FilterBar({ sources, filters, onChange }) {
       <div className="sep" />
 
       <div className="filter-group">
+        <span className="filter-lbl">Rôle</span>
+        <div className="chips">
+          {[['', 'Tous'], ['captain', 'Captain'], ['fo', 'F/O']].map(([val, label]) => (
+            <button
+              key={val}
+              className={`chip ${filters.role === val ? 'active' : ''}`}
+              onClick={() => set('role', val)}
+            >{label}</button>
+          ))}
+        </div>
+      </div>
+
+      <div className="sep" />
+
+      <div className="filter-group">
         <span className="filter-lbl">Statut</span>
         <div className="chips">
           {[['all', 'Tous', ''], ['active', 'Actives', ''], ['full', 'Complètes', 'chip-red'], ['expired', 'Expirées', 'chip-red']].map(([val, label, extra]) => (

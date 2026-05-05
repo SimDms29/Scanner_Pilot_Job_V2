@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { getJobs, getSources, getStatus, getScannerStatus } from '../api'
 import Header from '../components/Header'
 import FilterBar from '../components/FilterBar'
@@ -6,7 +6,10 @@ import ScannerStatus from '../components/ScannerStatus'
 import JobList from '../components/JobList'
 import MapPanel from '../components/MapPanel'
 
-const DEFAULT_FILTERS = { q: '', source: '', status: 'active' }
+const DEFAULT_FILTERS = { q: '', source: '', status: 'active', role: '' }
+
+const CAPTAIN_RE = /\b(captain|cpt|cdr|commander)\b/i
+const FO_RE      = /\b(first officer|f\/o)\b/i
 const MOBILE_BP = 768
 
 export default function Scanner() {
@@ -28,6 +31,12 @@ export default function Scanner() {
     const data = await getJobs(filters)
     setJobs(data)
   }, [filters])
+
+  const visibleJobs = useMemo(() => {
+    if (!filters.role) return jobs
+    const re = filters.role === 'captain' ? CAPTAIN_RE : FO_RE
+    return jobs.filter(j => re.test(j.title))
+  }, [jobs, filters.role])
 
   const loadMeta = useCallback(async () => {
     const [srcs, scannerData, statusData] = await Promise.all([
@@ -78,16 +87,16 @@ export default function Scanner() {
           <FilterBar sources={sources} filters={filters} onChange={setFilters} />
           <ScannerStatus sources={scannerSrcs} />
           <div className="count-bar">
-            {jobs.length} offre{jobs.length !== 1 ? 's' : ''} affichée{jobs.length !== 1 ? 's' : ''}
+            {visibleJobs.length} offre{visibleJobs.length !== 1 ? 's' : ''} affichée{visibleJobs.length !== 1 ? 's' : ''}
           </div>
-          <JobList jobs={jobs} selectedIdx={selectedIdx} onSelect={handleSelect} />
+          <JobList jobs={visibleJobs} selectedIdx={selectedIdx} onSelect={handleSelect} />
         </div>
 
         <div className="drag-handle" onMouseDown={() => { dragging.current = true }} />
 
         <div className={`right${activeTab === 'list' ? ' mob-hidden' : ''}`}>
           <MapPanel
-            jobs={jobs}
+            jobs={visibleJobs}
             selectedIdx={selectedIdx}
             onSelect={handleSelect}
             lastScan={lastScan}

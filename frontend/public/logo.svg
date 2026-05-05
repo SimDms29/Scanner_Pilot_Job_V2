@@ -1,4 +1,8 @@
 <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Top-down airplane silhouette — 14-point polygon, pointing up.
+    Fuselage ±7 from center, wings span 5→95, tail fins at ±24.
+  -->
   <path d="M 50 8
            L 57 40 L 95 58 L 60 62
            L 60 72 L 74 84 L 58 79

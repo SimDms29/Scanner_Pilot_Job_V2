@@ -3,8 +3,7 @@ import threading
 import time
 from datetime import datetime, timedelta
 
-from storage import upsert_job, expire_missing_jobs, mark_notified, set_meta, update_source_status
-from notifications import send_new_jobs
+from storage import upsert_job, expire_missing_jobs, set_meta, update_source_status
 from scrapers.ats import bamboohr, recruitee
 from scrapers.companies import amelia, netjets, la_compagnie, chalair, pan_europeenne, helvetic, elitavia, avconjet, flyinggroup, air_alliance, dat, loganair, jetaviation, vistajet, luxair, platoon, gamaaviation, wideroe, spreeflug, globeair, arcusair, dasprivatejets, globaljet
 from models import JobOffer
@@ -82,7 +81,7 @@ def _timed_scan(name: str, fn, *args) -> tuple[list[JobOffer] | None, int]:
     return results, int((time.monotonic() - t0) * 1000)
 
 
-def run_scan(notify_discord: bool = False):
+def run_scan():
     global _scan_running
     with _lock:
         if _scan_running:
@@ -111,13 +110,6 @@ def run_scan(notify_discord: bool = False):
         set_meta("next_scan", (now + timedelta(hours=CHECK_INTERVAL_HOURS)).isoformat())
 
         log.info(f"=== SCAN TERMINÉ — {len(new_jobs)} nouvelle(s) offre(s) ===")
-
-        if notify_discord and new_jobs:
-            send_new_jobs(new_jobs)
-            for job in new_jobs:
-                mark_notified(job.id)
-        elif notify_discord:
-            log.info("Aucune nouvelle offre — Discord non notifié")
 
     finally:
         with _lock:
