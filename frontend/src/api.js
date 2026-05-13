@@ -26,6 +26,3 @@ export const getScannerStatus = async () => {
   const data = await get('/scanner')
   return data.sources ?? []
 }
-
-export const triggerScan = () =>
-  fetch(BASE + '/scan', { method: 'POST' }).then(r => r.json())

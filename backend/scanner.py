@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from storage import upsert_job, expire_missing_jobs, set_meta, update_source_status
 from scrapers.ats import bamboohr, recruitee
-from scrapers.companies import amelia, netjets, la_compagnie, chalair, pan_europeenne, helvetic, elitavia, avconjet, flyinggroup, air_alliance, dat, loganair, jetaviation, vistajet, luxair, platoon, gamaaviation, wideroe, spreeflug, globeair, arcusair, dasprivatejets, globaljet
+from scrapers.companies import amelia, netjets, la_compagnie, chalair, pan_europeenne, helvetic, elitavia, avconjet, flyinggroup, air_alliance, dat, loganair, jetaviation, vistajet, luxair, platoon, gamaaviation, wideroe, spreeflug, globeair, arcusair, dasprivatejets, globaljet, aircorsica
 from models import JobOffer
 
 log = logging.getLogger(__name__)
@@ -50,6 +50,7 @@ CUSTOM_SCRAPERS = [
     ("Arcus Air",             arcusair.scan),
     ("DAS Private Jets",      dasprivatejets.scan),
     ("GlobalJet",             globaljet.scan),
+    ("Air Corsica",           aircorsica.scan),
 ]
 
 
