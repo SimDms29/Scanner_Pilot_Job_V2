@@ -28,7 +28,7 @@ RECRUITEE_COMPANIES = [
 
 CUSTOM_SCRAPERS = [
     ("Amelia",           amelia.scan),
-    ("NetJets Europe",   netjets.scan),
+    ("NetJets Europe",   netjets.scan),  # via Cloudflare Worker (netjets-proxy.dumassimon22.workers.dev)
     ("La Compagnie",     la_compagnie.scan),
     ("Chalair",          chalair.scan),
     ("Pan Européenne",   pan_europeenne.scan),
