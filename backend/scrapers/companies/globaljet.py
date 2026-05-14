@@ -4,6 +4,7 @@ Site Drupal avec Views AJAX : jobs rendus côté client → Playwright requis.
 URL hash générée par slugification du titre (confirmée par inspection DOM).
 """
 import logging
+import os
 import re
 from playwright.sync_api import sync_playwright
 from models import JobOffer
@@ -39,7 +40,8 @@ def scan() -> list[JobOffer] | None:
     found: list[JobOffer] = []
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
+            exe = os.getenv("PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH")
+            browser = p.chromium.launch(headless=True, **({"executable_path": exe} if exe else {}))
             page = browser.new_page()
             page.goto(BASE_URL, wait_until='domcontentloaded', timeout=30000)
             page.wait_for_selector('.vacancies__item', timeout=15000)

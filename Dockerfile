@@ -10,17 +10,19 @@ RUN npm run build
 FROM python:3.11-slim
 WORKDIR /app/backend
 
-# Dépendances système (+ Chromium pour Playwright)
+# Chromium système (évite le CDN Playwright inaccessible en prod)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
+    chromium \
     && rm -rf /var/lib/apt/lists/*
+
+# Playwright utilise le chromium système
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Dépendances Python
 COPY backend/requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Chromium pour Playwright (installe aussi les libs système nécessaires)
-RUN playwright install --with-deps chromium
 
 # Code backend
 COPY backend/ ./
