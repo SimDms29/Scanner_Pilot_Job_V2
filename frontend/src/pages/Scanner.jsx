@@ -6,7 +6,7 @@ import ScannerStatus from '../components/ScannerStatus'
 import JobList from '../components/JobList'
 import MapPanel from '../components/MapPanel'
 
-const DEFAULT_FILTERS = { q: '', source: '', status: 'active', role: '' }
+const DEFAULT_FILTERS = { q: '', source: '', status: 'active', role: '', sort: 'desc' }
 
 const CAPTAIN_RE = /\b(captain|cpt|cdr|commander)\b/i
 const FO_RE      = /\b(first officer|f\/o)\b/i
@@ -33,10 +33,17 @@ export default function Scanner() {
   }, [filters])
 
   const visibleJobs = useMemo(() => {
-    if (!filters.role) return jobs
-    const re = filters.role === 'captain' ? CAPTAIN_RE : FO_RE
-    return jobs.filter(j => re.test(j.title))
-  }, [jobs, filters.role])
+    let list = jobs
+    if (filters.role) {
+      const re = filters.role === 'captain' ? CAPTAIN_RE : FO_RE
+      list = list.filter(j => re.test(j.title))
+    }
+    return [...list].sort((a, b) => {
+      const ta = new Date(a.first_seen).getTime()
+      const tb = new Date(b.first_seen).getTime()
+      return filters.sort === 'asc' ? ta - tb : tb - ta
+    })
+  }, [jobs, filters.role, filters.sort])
 
   const loadMeta = useCallback(async () => {
     const [srcs, scannerData, statusData] = await Promise.all([

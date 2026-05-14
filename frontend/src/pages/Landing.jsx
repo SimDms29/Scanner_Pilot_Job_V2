@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { getStatus } from '../api'
 
 const UPDATES = [
   {
     date: 'Mai 2026',
     items: [
+      'Possibilité de trier les offres en fonction de leur date de publication',
       'Filtre Captain / F/O ajouté sur la page des offres',
       'GlobalJet intégré via Playwright (9 postes pilote : G650, Falcon 2000, PC24, A320ACJ…)',
       'DAS Private Jets ajouté (Phenom 300, Mengen)',
@@ -45,7 +47,7 @@ function ActuModal({ onClose }) {
   )
 }
 
-const STATS = [
+const BASE_STATS = [
   { value: '26', label: 'Compagnies scannées' },
   { value: '12h', label: 'Fréquence de scan' },
 ]
@@ -117,6 +119,15 @@ function WingFuelModal({ onClose }) {
 export default function Landing() {
   const [showWingFuel, setShowWingFuel] = useState(false)
   const [showActu, setShowActu] = useState(false)
+  const [activeCount, setActiveCount] = useState(null)
+
+  useEffect(() => {
+    getStatus().then(d => setActiveCount(d.active ?? null)).catch(() => {})
+  }, [])
+
+  const stats = activeCount !== null
+    ? [...BASE_STATS, { value: String(activeCount), label: 'Offres actives' }]
+    : BASE_STATS
 
   return (
     <div className="landing">
@@ -141,31 +152,42 @@ export default function Landing() {
       {showActu && <ActuModal onClose={() => setShowActu(false)} />}
 
       {/* Hero */}
-      <main className="landing-main">
-        <div className="landing-badge">Veille recrutement PNT · Business Aviation · Europe</div>
-
-        <h2 className="landing-title">
-          Les offres pilote que vous<br />n'aviez pas le temps de chercher
-        </h2>
-
-        <p className="landing-sub">
-          WingJobs scanne automatiquement les portails de recrutement
-          des compagnies d'aviation d'affaires européennes, toutes les 12 heures.
-        </p>
-
-        <div className="landing-stats">
-          {STATS.map(s => (
-            <div key={s.label} className="landing-stat">
-              <div className="landing-stat-val">{s.value}</div>
-              <div className="landing-stat-lbl">{s.label}</div>
-            </div>
-          ))}
+      <section className="hero-section">
+        <div className="hero-bg-photos">
+          <img className="hero-bg-photo" src="https://images.pexels.com/photos/30448307/pexels-photo-30448307.jpeg?auto=compress&cs=tinysrgb&w=1920" alt="" />
         </div>
+        <div className="hero-overlay" />
+        <div className="hero-blobs">
+          <div className="blob blob-1" />
+          <div className="blob blob-2" />
+          <div className="blob blob-3" />
+        </div>
+        <div className="hero-content">
+          <div className="landing-badge">Veille recrutement PNT · Business Aviation · Europe</div>
 
-        <Link to="/jobs" className="landing-cta">
-          Voir les offres maintenant →
-        </Link>
-      </main>
+          <h2 className="landing-title">
+            Les offres pilote que vous<br />n'aviez pas le temps de chercher
+          </h2>
+
+          <p className="landing-sub">
+            WingJobs scanne automatiquement les portails de recrutement
+            des compagnies d'aviation d'affaires européennes, toutes les 12 heures.
+          </p>
+
+          <div className="landing-stats">
+            {stats.map(s => (
+              <div key={s.label} className="landing-stat">
+                <div className="landing-stat-val">{s.value}</div>
+                <div className="landing-stat-lbl">{s.label}</div>
+              </div>
+            ))}
+          </div>
+
+          <Link to="/jobs" className="landing-cta">
+            Voir les offres maintenant →
+          </Link>
+        </div>
+      </section>
 
       {/* Comment ça marche */}
       <section className="landing-how">
@@ -194,6 +216,14 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      <div className="wingfuel-strip">
+        <span className="wingfuel-strip-label">Par la même équipe —</span>
+        <a href="https://wingfuel.fr" target="_blank" rel="noreferrer" className="wingfuel-strip-link">
+          Wing<em>Fuel</em>
+        </a>
+        <span className="wingfuel-strip-desc">Suivi carburant pour l'aviation générale</span>
+      </div>
 
       <footer className="landing-footer">
         <span>© 2026 Simon Dumas — WingJobs · Projet indépendant, non affilié aux compagnies listées</span>

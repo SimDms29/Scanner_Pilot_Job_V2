@@ -1,5 +1,8 @@
 # WingJobs — CLAUDE.md
 
+> Contexte technique condensé : voir [Archi.md](Archi.md)
+> Règles de collaboration : voir [skill.md](skill.md)
+
 Veille automatisée des offres de recrutement PNT (Pilotes) en aviation d'affaires, principalement Europe francophone.
 
 ## Ce que fait le projet
@@ -133,14 +136,14 @@ Logique dans `scanner.py` :
 | VistaJet | iCIMS (in_iframe=1) | `companies/vistajet.py` | ✅ — 5 postes EU (FO, SO, TRI/TRE) |
 | Luxair | Cornerstone OnDemand (CSOD) API | `companies/luxair.py` | ✅ — 5 postes pilote (FO E1/E2, FO/Cpt B737) — token JWT récupéré dynamiquement |
 | GlobalJet | Drupal Views AJAX → Playwright | `companies/globaljet.py` | ✅ — 9 postes PNT (G650, Falcon, PC24, A320ACJ, Global, G7500, G550) — URL hash construite par slugification |
+| Platoon Aviation | Personio XML feed | `companies/platoon.py` | ✅ — PC-24, Hamburg |
 | Blue Islands | — | — | ⛔ Domaine DNS mort (compagnie probablement cessée) |
-| Air Corsica | — | — | ⛔ Salesforce Lightning (JS pur, `crtarecr` package) — `aircorsica-rh.my.salesforce-sites.com/Recrutement`, Playwright requis |
+| Air Corsica | Salesforce Lightning (crtarecr) → Playwright | `companies/aircorsica.py` | ✅ — 0 poste pilote actuellement, scraper actif — cards `.job-item`, ville `[icon-name="utility:checkin"]` |
 | Oyonnair | — | — | ⛔ Email only, faux positifs (catégories permanentes) — supprimé |
 | Twin Jet | — | — | ⛔ Email only (`recrutement.pnt@twinjet.net`) |
 | Air Hamburg | — | — | ⛔ Groupe Vista Global, bloqué Cloudflare |
 | Volotea | — | — | ⛔ SmartRecruiters slug invalide, page careers inaccessible |
 | ASL Airlines | CezanneHR | — | ⛔ Pas d'API JSON, HTML sans postes pilote identifiables |
-| Platoon Aviation | JS pur | — | ⏳ Playwright requis |
 
 ---
 

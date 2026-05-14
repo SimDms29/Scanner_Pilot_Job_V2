@@ -4,7 +4,7 @@ import threading
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -36,13 +36,15 @@ async def lifespan(app: FastAPI):
     sched.shutdown(wait=False)
 
 
-app = FastAPI(title="WingJobs", lifespan=lifespan)
+SCAN_API_KEY = os.getenv("SCAN_API_KEY", "")
+
+app = FastAPI(title="WingJobs", lifespan=lifespan, docs_url=None, redoc_url=None)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["https://jobs.wingfuel.fr"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["X-Scan-Key"],
 )
 
 
@@ -77,7 +79,9 @@ def get_status():
 
 
 @app.post("/api/scan")
-def trigger_scan(background_tasks: BackgroundTasks):
+def trigger_scan(background_tasks: BackgroundTasks, x_scan_key: str = Header(default="")):
+    if not SCAN_API_KEY or x_scan_key != SCAN_API_KEY:
+        raise HTTPException(status_code=403, detail="Forbidden")
     if scanner.is_running():
         return {"message": "Scan déjà en cours", "status": "running"}
     background_tasks.add_task(scanner.run_scan, False)
