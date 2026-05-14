@@ -6,20 +6,19 @@ const UPDATES = [
   {
     date: 'Mai 2026',
     items: [
-      'AstonJet ajouté (3 postes Captain Citation, Paris Le Bourget)',
+      'AstonJet ajouté (Captain Citation, Paris Le Bourget)',
       'Possibilité de trier les offres en fonction de leur date de publication',
       'Filtre Captain / F/O ajouté sur la page des offres',
-      'GlobalJet intégré via Playwright (9 postes pilote : G650, Falcon 2000, PC24, A320ACJ…)',
+      'GlobalJet intégré via Playwright (G650, Falcon 2000, PC24, A320ACJ…)',
       'DAS Private Jets ajouté (Phenom 300, Mengen)',
       'Arcus Air intégré (portail HubSpot)',
-      '26 compagnies scannées au total',
     ],
   },
   {
     date: 'Avril 2026',
     items: [
       'Lancement de WingJobs en accès ouvert',
-      'Première version avec 22 compagnies : VistaJet, Luxair, Loganair, Jet Aviation…',
+      'Première version avec VistaJet, Luxair, Loganair, Jet Aviation…',
       'Carte interactive Europe avec marqueurs par statut',
     ],
   },
