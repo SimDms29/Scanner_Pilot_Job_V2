@@ -18,7 +18,7 @@ PILOT_RE = re.compile(
 )
 
 
-def scan(company_slug: str, company_name: str, default_location: str) -> list[JobOffer] | None:
+def scan(company_slug: str, company_name: str, default_location: str, link_override: str | None = None) -> list[JobOffer] | None:
     url = f"https://{company_slug}.recruitee.com/api/offers/"
     found: list[JobOffer] = []
     try:
@@ -30,7 +30,7 @@ def scan(company_slug: str, company_name: str, default_location: str) -> list[Jo
             if not PILOT_RE.search(title):
                 continue
             loc = o.get("city") or o.get("location") or default_location
-            link = (
+            link = link_override or (
                 o.get("careers_url")
                 or f"https://{company_slug}.recruitee.com/o/{o.get('slug', '')}"
             )

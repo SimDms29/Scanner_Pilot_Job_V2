@@ -22,9 +22,9 @@ BAMBOOHR_COMPANIES = [
 ]
 
 RECRUITEE_COMPANIES = [
-    ("dcaviationgmbh", "DC Aviation",  "Stuttgart"),
-    ("tagaviation3",   "TAG Aviation", "Geneva"),
-    ("astonjet",       "AstonJet",     "Paris Le Bourget"),
+    ("dcaviationgmbh", "DC Aviation",  "Stuttgart",        None),
+    ("tagaviation3",   "TAG Aviation", "Geneva",           None),
+    ("astonjet",       "AstonJet",     "Paris Le Bourget", "https://astonjet.recruitee.com/"),
 ]
 
 CUSTOM_SCRAPERS = [
@@ -99,8 +99,8 @@ def run_scan():
             results, ms = _timed_scan(name, bamboohr.scan, slug, name, default_loc)
             new_jobs += _run_source(name, results, ms)
 
-        for slug, name, default_loc in RECRUITEE_COMPANIES:
-            results, ms = _timed_scan(name, recruitee.scan, slug, name, default_loc)
+        for slug, name, default_loc, link_override in RECRUITEE_COMPANIES:
+            results, ms = _timed_scan(name, recruitee.scan, slug, name, default_loc, link_override)
             new_jobs += _run_source(name, results, ms)
 
         for name, fn in CUSTOM_SCRAPERS:

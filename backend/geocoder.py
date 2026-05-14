@@ -11,8 +11,10 @@ KNOWN_COORDS: dict[str, tuple[float, float]] = {
     # France
     "paris cdg": (49.0097, 2.5478),
     "paris orly": (48.7262, 2.3652),
-    "paris": (48.8566, 2.3522),
+    "paris le bourget": (48.9697, 2.4411),
     "le bourget": (48.9697, 2.4411),
+    "bonneuil": (48.9697, 2.4411),
+    "paris": (48.8566, 2.3522),
     "guyancourt": (48.7729, 2.0696),
     "nice": (43.7102, 7.2620),
     "lyon": (45.7640, 4.8357),

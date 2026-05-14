@@ -6,12 +6,12 @@ const UPDATES = [
   {
     date: 'Mai 2026',
     items: [
-      'AstonJet ajouté (Captain Citation, Paris Le Bourget)',
+      'AstonJet ajouté',
       'Possibilité de trier les offres en fonction de leur date de publication',
       'Filtre Captain / F/O ajouté sur la page des offres',
-      'GlobalJet intégré via Playwright (G650, Falcon 2000, PC24, A320ACJ…)',
-      'DAS Private Jets ajouté (Phenom 300, Mengen)',
-      'Arcus Air intégré (portail HubSpot)',
+      'GlobalJet intégré via Playwright',
+      'DAS Private Jets ajouté',
+      'Arcus Air intégré ',
     ],
   },
   {
