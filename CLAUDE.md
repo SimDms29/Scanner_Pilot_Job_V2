@@ -125,6 +125,7 @@ Logique dans `scanner.py` :
 | Chalair | WordPress HTML | `companies/chalair.py` | ✅ — filtre "candidature spontanée" actif |
 | Pan Européenne | sentinel statut | `companies/pan_europeenne.py` | ✅ — retourne `status=full` si "no employment" |
 | TAG Aviation | Recruitee API | `ats/recruitee.py` | ✅ — slug `tagaviation3`, postes globaux (HK, Malaisie…) |
+| AstonJet | Recruitee API | `ats/recruitee.py` | ✅ — 3 postes Captain Citation (Latitude, Mustang, M2), Paris Le Bourget |
 | Helvetic Airways | Portal custom HTML | `companies/helvetic.py` | ✅ — 0 poste en ce moment, se déclenche dès ouverture |
 | Elit'Avia | WordPress Elementor HTML | `companies/elitavia.py` | ✅ — 4 postes FO/Flight Crew |
 | Avcon Jet | WordPress HTML | `companies/avconjet.py` | ✅ — 2 postes FO/Captain Challenger |

@@ -24,6 +24,7 @@ BAMBOOHR_COMPANIES = [
 RECRUITEE_COMPANIES = [
     ("dcaviationgmbh", "DC Aviation",  "Stuttgart"),
     ("tagaviation3",   "TAG Aviation", "Geneva"),
+    ("astonjet",       "AstonJet",     "Paris Le Bourget"),
 ]
 
 CUSTOM_SCRAPERS = [

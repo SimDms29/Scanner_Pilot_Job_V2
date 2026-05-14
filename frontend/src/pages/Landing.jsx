@@ -6,6 +6,7 @@ const UPDATES = [
   {
     date: 'Mai 2026',
     items: [
+      'AstonJet ajouté (3 postes Captain Citation, Paris Le Bourget)',
       'Possibilité de trier les offres en fonction de leur date de publication',
       'Filtre Captain / F/O ajouté sur la page des offres',
       'GlobalJet intégré via Playwright (9 postes pilote : G650, Falcon 2000, PC24, A320ACJ…)',
@@ -48,7 +49,7 @@ function ActuModal({ onClose }) {
 }
 
 const BASE_STATS = [
-  { value: '26', label: 'Compagnies scannées' },
+  { value: '27', label: 'Compagnies scannées' },
   { value: '12h', label: 'Fréquence de scan' },
 ]
 
@@ -60,7 +61,7 @@ const HOW = [
       </svg>
     ),
     title: 'Scan automatique',
-    desc: '26 portails de recrutement parcourus toutes les 12 heures — BambooHR, Recruitee, Salesforce, Playwright pour les sites JS-rendus. Sans intervention manuelle.',
+    desc: '27 portails de recrutement parcourus toutes les 12 heures — BambooHR, Recruitee, Salesforce, Playwright pour les sites JS-rendus. Sans intervention manuelle.',
   },
   {
     icon: (
@@ -85,7 +86,7 @@ const HOW = [
 const SOURCES = [
   'VistaJet', 'GlobalJet', 'Luxair', 'Loganair', 'Jet Aviation', 'Gama Aviation',
   "Elit'Avia", 'Avcon Jet', 'TAG Aviation', 'DC Aviation', 'DAS Private Jets',
-  'Widerøe', 'Spreeflug', 'GlobeAir', 'Arcus Air', 'Air Alliance', '+ 10 autres',
+  'Widerøe', 'Spreeflug', 'GlobeAir', 'Arcus Air', 'Air Alliance', 'AstonJet', '+ 10 autres',
 ]
 
 function WingFuelModal({ onClose }) {
