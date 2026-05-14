@@ -3,6 +3,16 @@ function isNew(firstSeen) {
   return Date.now() - new Date(firstSeen).getTime() < 48 * 3600 * 1000
 }
 
+function timeAgo(dateStr) {
+  if (!dateStr) return null
+  const h = Math.floor((Date.now() - new Date(dateStr).getTime()) / 3600000)
+  if (h < 1) return "à l'instant"
+  if (h < 24) return `il y a ${h}h`
+  if (h < 48) return 'hier'
+  return `il y a ${Math.floor(h / 24)}j`
+}
+
+
 const STATUS_LABEL = { active: 'Actif', full: 'Complet', expired: 'Expiré' }
 
 export default function JobCard({ job, highlighted, onClick }) {
@@ -13,6 +23,7 @@ export default function JobCard({ job, highlighted, onClick }) {
   ].filter(Boolean).join(' ')
 
   const fresh = isNew(job.first_seen)
+  const age = timeAgo(job.first_seen)
 
   return (
     <div className={classes} onClick={onClick}>
@@ -38,17 +49,20 @@ export default function JobCard({ job, highlighted, onClick }) {
             </svg>
             {job.location}
           </span>
-          {job.status !== 'full' && (
-            <a
-              className="card-link"
-              href={job.link}
-              target="_blank"
-              rel="noreferrer"
-              onClick={e => e.stopPropagation()}
-            >
-              Voir l'offre →
-            </a>
-          )}
+          <div className="card-bottom-right">
+            {age && <span className="card-age">{age}</span>}
+            {job.status !== 'full' && (
+              <a
+                className="card-link"
+                href={job.link}
+                target="_blank"
+                rel="noreferrer"
+                onClick={e => e.stopPropagation()}
+              >
+                Voir l'offre →
+              </a>
+            )}
+          </div>
         </div>
       </div>
     </div>

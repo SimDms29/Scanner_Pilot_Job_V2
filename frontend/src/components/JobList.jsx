@@ -9,29 +9,36 @@ export default function JobList({ jobs, selectedIdx, onSelect }) {
     )
   }
 
-  // Group by source
+  const groupOrder = []
   const groups = {}
   jobs.forEach((job, i) => {
-    ;(groups[job.source] = groups[job.source] || []).push({ job, i })
+    if (!groups[job.source]) {
+      groups[job.source] = []
+      groupOrder.push(job.source)
+    }
+    groups[job.source].push({ job, i })
   })
 
   return (
     <div className="jobs-list">
-      {Object.entries(groups).map(([src, items]) => (
-        <div key={src}>
-          <div className="group-header">
-            {src} &nbsp;·&nbsp; {items.length} offre{items.length > 1 ? 's' : ''}
+      {groupOrder.map(src => {
+        const items = groups[src]
+        return (
+          <div key={src}>
+            <div className="group-header">
+              {src} &nbsp;·&nbsp; {items.length} offre{items.length > 1 ? 's' : ''}
+            </div>
+            {items.map(({ job, i }) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                highlighted={selectedIdx === i}
+                onClick={() => onSelect(i)}
+              />
+            ))}
           </div>
-          {items.map(({ job, i }) => (
-            <JobCard
-              key={job.id}
-              job={job}
-              highlighted={selectedIdx === i}
-              onClick={() => onSelect(i)}
-            />
-          ))}
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

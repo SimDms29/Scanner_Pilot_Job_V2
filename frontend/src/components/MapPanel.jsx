@@ -116,6 +116,12 @@ export default function MapPanel({ jobs, selectedIdx, onSelect, lastScan, nextSc
         <div><span className="live-dot" />En ligne</div>
         <div>Dernier scan : <span>{fmtDate(lastScan)}</span></div>
         <div>Prochain scan : <span>{fmtDate(nextScan)}</span></div>
+        <div style={{ marginTop: 6, paddingTop: 6, borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <a href="https://wingfuel.fr" target="_blank" rel="noreferrer" style={{ color: 'var(--text-dim)', textDecoration: 'none', transition: 'color 0.15s' }}
+            onMouseEnter={e => e.target.style.color = 'var(--text-mid)'}
+            onMouseLeave={e => e.target.style.color = 'var(--text-dim)'}
+          >Wing<em style={{ color: 'var(--green)', fontStyle: 'normal' }}>Fuel</em> →</a>
+        </div>
       </div>
     </div>
   )
