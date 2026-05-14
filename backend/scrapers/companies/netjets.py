@@ -11,7 +11,7 @@ from geocoder import get_coords
 
 log = logging.getLogger(__name__)
 
-SEARCH_URL = "https://netjets.jobs.hr.cloud.sap/europe/search/?createNewAlert=false&q=pilot"
+SEARCH_URL = "https://netjets-proxy.dumassimon22.workers.dev/"
 BASE_URL   = "https://netjets.jobs.hr.cloud.sap"
 HEADERS    = {"User-Agent": "Mozilla/5.0"}
 PILOT_KW   = {"pilot", "captain", "first officer", "second in command", "f/o", "pic", "sic"}
@@ -20,7 +20,7 @@ PILOT_KW   = {"pilot", "captain", "first officer", "second in command", "f/o", "
 def scan() -> list[JobOffer] | None:
     found: list[JobOffer] = []
     try:
-        r = requests.get(SEARCH_URL, headers=HEADERS, timeout=15)
+        r = requests.get(SEARCH_URL, headers=HEADERS, timeout=30)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, "html.parser")
         for row in soup.find_all("tr"):

@@ -210,7 +210,7 @@ Pour identifier l'ATS d'un site : F12 → Réseau → XHR → recharger la page 
 - **Luxaviation** : 1er scan lent (~60s) car geocoding Nominatim pour Dubai, Kuala Lumpur, etc. — résolu après mise en cache
 - **Pan Européenne** : sentinel volontaire — "Effectifs complets" en `status=full` est le comportement attendu
 - **Chalair** : scraper actif mais ne retournera des offres que si de vraies positions PNT sont publiées (candidatures spontanées filtrées)
-- **NetJets** : lien sur `netjets.jobs.hr.cloud.sap` (SAP), pas sur `careers.netjets.com`
+- **NetJets** : `netjets.jobs.hr.cloud.sap` (SAP SuccessFactors) bloque les IPs datacenter au niveau TLS (`Connection reset by peer`). Contournement : Cloudflare Worker proxy (`netjets-proxy.dumassimon22.workers.dev`) qui relaie la requête depuis les IPs edge Cloudflare, non bloquées. `SEARCH_URL` dans `netjets.py` pointe vers le Worker, `BASE_URL` reste sur le domaine SAP (pour construire les liens). Si d'autres portails SAP posent le même problème, créer un Worker dédié par source (même pattern).
 - **Helvetic** : portal Apache Wicket avec session IDs dans les URLs de page, mais les ancres `#id` des postes sont stables — scrape `/flightcrew` sans session
 - **TAG Aviation** : slug Recruitee = `tagaviation3` (pas `tagaviation`)
 - **Elit'Avia** : WordPress Elementor — les liens "More Details→" ne portent pas le titre, fallback sur slug (préfixe `job-post-` strippé automatiquement)
